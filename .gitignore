@@ -1,0 +1,10 @@
+*.tmp
+.DS_Store
+packages/
+bower_components/
+node_modules/
+typings/
+node_modules/
+dist/
+webdeps/
+npm-debug.log
