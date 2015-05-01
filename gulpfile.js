@@ -11,6 +11,7 @@ var runSequence = require('run-sequence');
 var typescript = require('typescript');
 var merge = require('merge2');
 var download = require('gulp-download');
+var karma = require('karma').server;
 
 gulp.task('watch', function() {
   watch([
@@ -68,6 +69,22 @@ gulp.task('tscompile-pubsub-micro', function() {
       .pipe(sourcemaps.write())
       .pipe(gulp.dest('./dist/'))
     ]);
+});
+
+gulp.task('unittests', function (done) {
+  karma.start({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: true,
+    browsers: [ 'PhantomJS2' ]
+  }, done);
+});
+
+gulp.task('unittests-devel', function (done) {
+  karma.start({
+    configFile: __dirname + '/karma.conf.js',
+    singleRun: false,
+    debug: true
+  }, done);
 });
 
 gulp.task('release', function() {
