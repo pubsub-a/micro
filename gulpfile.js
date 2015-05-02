@@ -71,18 +71,18 @@ gulp.task('tscompile-pubsub-micro', function() {
     ]);
 });
 
-gulp.task('unittests', function (done) {
+gulp.task('test', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
     singleRun: true,
-    browsers: [ 'PhantomJS2' ]
   }, done);
 });
 
-gulp.task('unittests-devel', function (done) {
+gulp.task('test-debug', function (done) {
   karma.start({
     configFile: __dirname + '/karma.conf.js',
     singleRun: false,
+    browsers: [ 'Chrome' ],
     debug: true
   }, done);
 });
