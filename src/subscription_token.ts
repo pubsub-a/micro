@@ -1,9 +1,5 @@
 module PubSub {
 
-  interface disposeFunction {
-    (SubscriptionDisposedCallback): number;
-  }
-
   export class SubscriptionToken implements ISubscriptionToken {
 
     public isDisposed: boolean = false;

@@ -39,22 +39,18 @@ var defaultTsProject = function() { return ts.createProject({
     target: 'ES5',
     sortOutput: true,
     noExternalResolve: true,
+    declarationFiles: true,
     typescript: typescript
   });
 };
 
-gulp.task('fetch-pubsub-interfaces', function() {
-  return download('https://raw.githubusercontent.com/pubsub-a/pubsub-interfaces/master/src/pubsub-interfaces.ts')
-    .pipe(concat('pubsub-interfaces.ts'))
-    .pipe(gulp.dest('webdeps/'));
-});
 
 gulp.task('tscompile-pubsub-micro', function() {
   var tsResult = gulp.src([
       'custom.d.ts',
       './src/**/*.ts',
 
-      './webdeps/pubsub-interfaces.ts',
+      '../pubsub-interfaces/src/pubsub-interfaces.ts',
     ])
     .pipe(sourcemaps.init())
     .pipe(ts(defaultTsProject()));
@@ -90,7 +86,6 @@ gulp.task('test-debug', function (done) {
 gulp.task('release', function() {
   // run uglify after all other tasks
   runSequence(
-    'fetch-pubsub-interfaces',
     'tscompile-pubsub-micro',
     'uglify'
   );

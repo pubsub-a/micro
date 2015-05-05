@@ -76,7 +76,7 @@ module PubSub {
       invokeIfDefined(callback);
     }
 
-    channel (name: string) {
+    channel (name: string): IChannel {
       return new Channel (name, this.subscriptionCache);
     }
   }
