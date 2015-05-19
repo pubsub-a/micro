@@ -2,7 +2,7 @@ module PubSub {
 
   export class Util {
     
-    public static randomString(length?: number = 8): string
+    public static randomString(length: number = 8): string
     {
       var text = '';
       var allowedCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
