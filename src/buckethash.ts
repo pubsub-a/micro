@@ -1,4 +1,4 @@
-module PubSub {
+module PubSubA {
 
   export interface IBucketHash<T> {
     add (key: string, item: T): number;

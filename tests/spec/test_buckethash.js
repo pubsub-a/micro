@@ -1,7 +1,7 @@
 describe('BucketHash basic tests', function() {
 
   it ("should accept the first item and return 1 as the number of elements", function() {
-    var hash = new PubSub.BucketHash();
+    var hash = new PubSubA.BucketHash();
     var count = hash.add('key', 1);
 
     expect(count).toBe(1);
@@ -9,7 +9,7 @@ describe('BucketHash basic tests', function() {
 
 
   it ("should remove the last element and return 0 as the number of elements", function() {
-    var hash = new PubSub.BucketHash();
+    var hash = new PubSubA.BucketHash();
     var item = {};
     hash.add('key', item);
     var count = hash.remove('key', item);
@@ -18,7 +18,7 @@ describe('BucketHash basic tests', function() {
 
 
   it ("should only remove a single element in a bucket with duplicates", function() {
-    var hash = new PubSub.BucketHash();
+    var hash = new PubSubA.BucketHash();
     var item = {};
     hash.add('key', item);
     hash.add('key', item);
@@ -28,7 +28,7 @@ describe('BucketHash basic tests', function() {
   });
 
   it ("should throw an exception if the key does not exist", function() {
-    var hash = new PubSub.BucketHash();
+    var hash = new PubSubA.BucketHash();
     var fn = function() {
       hash.remove('key');
     };
@@ -37,7 +37,7 @@ describe('BucketHash basic tests', function() {
   });
 
   it ("throw an exception if the element is not in the bucket", function() {
-    var hash = new PubSub.BucketHash();
+    var hash = new PubSubA.BucketHash();
     var item = {};
     hash.add('key', item);
     hash.add('key', item);
@@ -46,7 +46,7 @@ describe('BucketHash basic tests', function() {
   });
 
   it ("should not have any elements for a key if it is removed", function() {
-    var hash = new PubSub.BucketHash();
+    var hash = new PubSubA.BucketHash();
     var item = 'foo';
     hash.add('key1', item);
     hash.add('key2', item);
@@ -66,7 +66,7 @@ describe('BucketHash basic tests', function() {
   });
 
   it ("should not have any elements for a cleared key", function() {
-    var hash = new PubSub.BucketHash();
+    var hash = new PubSubA.BucketHash();
     var item = function() {};
     hash.add('key', item); 
     hash.add('key', item); 

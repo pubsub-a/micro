@@ -1,4 +1,4 @@
-module PubSub {
+module PubSubA {
 
   export class AnonymousPubSub<T> {
     private channel: IChannel;
@@ -17,7 +17,7 @@ module PubSub {
     public trigger: (payload: T) => void;
 
     constructor () {
-      this.channel = new PubSub.MicroPubSub().channel('i');
+      this.channel = new PubSubA.MicroPubSub().channel('i');
       this.subscribe = this.on = this._subscribe.bind(this);
       this.publish = this.trigger = this._publish.bind(this);
     }

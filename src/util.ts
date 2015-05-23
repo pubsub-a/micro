@@ -1,4 +1,4 @@
-module PubSub {
+module PubSubA {
 
   export class Util {
     

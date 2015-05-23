@@ -1,5 +1,5 @@
 
-module PubSub {
+module PubSubA {
 
   export function invokeIfDefined (func:Function, ...args: any[]) {
     if (func) {
@@ -11,9 +11,9 @@ module PubSub {
   
     public static get (type: string) {
       if (type === 'pubsub+socketio' || type === 'pubsub+tls+socketio') {
-        return PubSub['Network']['SocketIO']['Client'];
+        return PubSubA['Network']['SocketIO']['Client'];
       } else if (type === 'pubsub+signalr' || type === 'pubsub+tls+signalr') {
-        // return PubSub.Network.SignalR.Client;
+        // return PubSubA.Network.SignalR.Client;
         return null;
       } else {
         throw new Error('Unknown provider: ' + type);
@@ -81,7 +81,7 @@ module PubSub {
     }
   }
 
-  class Publisher<T> implements PubSub.InternalInterfaces.IPublisher<T> {
+  class Publisher<T> implements PubSubA.InternalInterfaces.IPublisher<T> {
 
     constructor (public name: string, private cache: IBucketHash<ISubscriptionFunc<any>>) {
     }
@@ -94,7 +94,7 @@ module PubSub {
     }
   }
 
-  class Subscriber<T> implements PubSub.InternalInterfaces.ISubscriber<T> {
+  class Subscriber<T> implements PubSubA.InternalInterfaces.ISubscriber<T> {
 
     constructor (public name: string, private cache: IBucketHash<ISubscriptionFunc<T>>) {
     }

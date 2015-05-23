@@ -1,4 +1,4 @@
-module PubSub.InternalInterfaces {
+module PubSubA.InternalInterfaces {
 
   export interface IPublisher<T> {
     publish(obj: T, callback?: Function): void;
