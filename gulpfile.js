@@ -62,7 +62,7 @@ gulp.task('tscompile-pubsub-micro', function() {
 
     tsResult.js
       .pipe(concat('pubsub-micro.js'))
-      .pipe(sourcemaps.write())
+      // .pipe(sourcemaps.write())
       .pipe(gulp.dest('./dist/'))
     ]);
 });
