@@ -1,6 +1,6 @@
 module PubSubA {
 
-  export class AnonymousPubSub<T> {
+  class AnonymousPubSub<T> {
     private channel: IChannel;
 
     private _subscribe (fn: ISubscriptionFunc<T>) {
@@ -17,21 +17,22 @@ module PubSubA {
     public trigger: (payload: T) => void;
 
     constructor () {
-      this.channel = new PubSubA.MicroPubSub().channel('i');
+      this.channel = PubSubA.create('local').channel('i');
       this.subscribe = this.on = this._subscribe.bind(this);
       this.publish = this.trigger = this._publish.bind(this);
     }
+    
+  }
 
-    public static includeIn (
-      obj: Object,
-      publishName: string = 'publish',
-      subscribeName: string = 'subscribe'
-    ) {
-      // TODO obj must be instanceof/child of Object ?
-      var pubsub = new AnonymousPubSub();
-      obj[subscribeName] = pubsub.subscribe;
-      obj[publishName] = pubsub.publish;
-      return obj;
-    }
+  export function includeIn(
+    obj: Object,
+    publishName: string = 'publish',
+    subscribeName: string = 'subscribe'
+  ) {
+    // TODO obj must be instanceof/child of Object ?
+    var pubsub = new AnonymousPubSub();
+    obj[subscribeName] = pubsub.subscribe;
+    obj[publishName] = pubsub.publish;
+    return obj;
   }
 }

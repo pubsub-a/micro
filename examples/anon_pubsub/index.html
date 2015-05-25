@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="/examples/jquery.min.js"></script>
+    <script src="/dist/pubsub-micro.js"></script>
+    
+    <script type="text/javascript">
+    $(document).ready(function() {
+
+        var myObject = {};
+
+        // adds a .publish and .subscribe function to the object so we don't need any 
+        // string topics
+        PubSubA.includeIn(myObject);
+
+        // no .start() required for local usage...
+        var subscription = myObject.subscribe(function(message) {
+            var div = $('<div>').text('Received message: ' + message);
+            $('body').append(div);
+        });
+
+        setTimeout(function() {
+            myObject.publish('Hello, ');
+        }, 1000);
+
+        setTimeout(function() {
+            myObject.publish('World!');
+        }, 2000);
+
+        setTimeout(function() {
+            myObject.publish('I am PubSubA !');
+
+            // last message, unsubscribe (cleanup)
+            subscription.dispose();
+        }, 3000);
+    });
+    </script>
+</head>
+
+<body>
+</body>
+</html>

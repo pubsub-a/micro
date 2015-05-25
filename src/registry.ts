@@ -6,7 +6,7 @@ module PubSubA {
     provider[name] = ctor;
   }
 
-  export function create (name: string, options: any) {
+  export function create (name: string, options?: any) {
     if (!provider[name]) {
       throw new Error('Provider with name: ' + name + ' could not be found, did you forget to include the source?');
     }
