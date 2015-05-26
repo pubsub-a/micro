@@ -7,20 +7,6 @@ module PubSubA {
     }
   }
 
-  export class PubSubProvider {
-  
-    public static get (type: string) {
-      if (type === 'pubsub+socketio' || type === 'pubsub+tls+socketio') {
-        return PubSubA['Network']['SocketIO']['Client'];
-      } else if (type === 'pubsub+signalr' || type === 'pubsub+tls+signalr') {
-        // return PubSubA.Network.SignalR.Client;
-        return null;
-      } else {
-        throw new Error('Unknown provider: ' + type);
-      }
-    }
-  }
-
   export class ChannelStatic {
 
     // publish & subscribe are stubs that MUST be implemented by the deriving class

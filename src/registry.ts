@@ -17,6 +17,7 @@ module PubSubA {
   // register MicroPubSub immediately
   // HACK this relys on the compile order of typescript, find a better way to execute after
   // both registry and MicroPubSub are declared
+  // TODO should we return the same instance, always?
   (function() {
     PubSubA.addProvider('local', function() { return new PubSubA.MicroPubSub(); });
   }());
