@@ -1,0 +1,17 @@
+{
+    "compilerOptions": {
+        "out": "dist/pubsub-micro.js",
+        "sourceMap": false 
+    },
+    "files": [
+        "custom.d.ts",
+        "src/buckethash.ts",
+        "src/internal_interfaces.ts",
+        "src/pubsub_anonymous.ts",
+        "src/registry.ts",
+        "src/pubsub_micro.ts",
+        "src/subscription_token.ts",
+        "src/util.ts",
+        "../pubsub-interfaces/dist/pubsub-a-interface.d.ts"
+    ]
+}
