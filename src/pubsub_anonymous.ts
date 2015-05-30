@@ -17,7 +17,9 @@ module PubSubA {
     public trigger: (payload: T) => void;
 
     constructor () {
-      this.channel = PubSubA.create<IPubSub>('local').channel('i');
+      var localPubSub = PubSubA.create('local');
+      localPubSub.channel('i', (channel, ctx) => { this.channel = channel; });
+
       this.subscribe = this.on = this._subscribe.bind(this);
       this.publish = this.trigger = this._publish.bind(this);
     }
