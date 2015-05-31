@@ -12,13 +12,17 @@ module PubSubA {
     // publish & subscribe are stubs that MUST be implemented by the deriving class
     publish<T> (topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void
     {
+      throw new Error('This method must be override by implementations');
     }
 
     subscribe<T> (topic: string, subscription: ISubscriptionFunc<T>, callback?: Function)
       : ISubscriptionToken
     {
-      return void 0;
+      throw new Error('This method must be override by implementations');
     }
+
+    // The following code should only be overriden in rare cases, you should not implement/override
+    // beyond this point!
 
     // add trigger & on alias
     trigger<T> (topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void {
