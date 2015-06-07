@@ -66,8 +66,11 @@ module PubSubA {
       invokeIfDefined(callback);
     }
 
-    channel (name: string, callback: IChannelReadyCallback): void {
-      callback(new Channel(name, this.subscriptionCache), this);
+    channel (name: string, callback: IChannelReadyCallback): IChannel {
+      var channel = new Channel(name, this.subscriptionCache);
+      if (callback)
+        callback(channel, this);
+      return channel;
     }
   }
 
