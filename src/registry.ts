@@ -14,6 +14,10 @@ module PubSubA {
     return <IPubSub> ctor.call(PubSubA, options);
   }
 
+  export function getProvider () {
+    return provider;
+  }
+
   // register MicroPubSub immediately
   // HACK this relys on the compile order of typescript, find a better way to execute after
   // both registry and MicroPubSub are declared
