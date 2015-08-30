@@ -57,7 +57,7 @@ module PubSubA {
     channel (name: string, callback: IChannelReadyCallback): IChannel {
       var channel = new Channel(name, this.subscriptionCache);
       if (callback)
-        callback(channel, this);
+        callback(channel);
       return channel;
     }
 
@@ -100,6 +100,7 @@ module PubSubA {
   class Channel extends ChannelStatic implements IChannel {
     constructor (public name: string, private cache: IBucketHash<ISubscriptionFunc<any>>) {
       super();
+      this.name = name;
     }
 
     publish<T> (topic: string, payload: T, callback?: Function) {
