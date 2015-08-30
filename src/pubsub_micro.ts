@@ -24,17 +24,6 @@ module PubSubA {
     // The following code should only be overriden in rare cases, you should not implement/override
     // beyond this point!
 
-    // add trigger & on alias
-    trigger<T> (topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void {
-      this.publish<T> (topic, payload, callback);
-    }
-
-    on<T> (topic: string, subscription: ISubscriptionFunc<T>, callback?: Function)
-      : ISubscriptionToken
-    {
-      return this.subscribe<T> (topic, subscription, callback);
-    }
-
     once<T> (topic: string, subscription: ISubscriptionFunc<T>, callback?: Function)
       : ISubscriptionToken
     {
@@ -47,7 +36,6 @@ module PubSubA {
       internal_subs = this.subscribe<T> (topic, wrapperFunc, callback);
       return internal_subs;
     }
-
   }
 
   export class MicroPubSub implements IPubSub {
