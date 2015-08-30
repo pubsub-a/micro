@@ -2,7 +2,7 @@
 describe('Anonymous PubSub', function() {
   var hub = {};
   beforeEach(function() {
-    PubSubA.includeIn(hub);
+    PubSubA.MicroPubSub.includeIn(hub);
   });
 
   it ('should trigger a subscription and return a count', function(done) {
@@ -16,9 +16,9 @@ describe('Anonymous PubSub', function() {
 
   });
 
-  it ('should be able to monkey-patch an existing objectd', function(done) {
+  it ('should be able to monkey-patch an existing object', function(done) {
     var myObject = {};
-    PubSubA.includeIn(myObject);
+    PubSubA.MicroPubSub.includeIn(myObject);
 
     myObject.subscribe(function(val) {
       expect(val).toBe(true);
@@ -30,7 +30,7 @@ describe('Anonymous PubSub', function() {
   });
   it ('should be able to monkey-patch an existing object with custom function names', function(done) {
     var myObject = {};
-    PubSubA.includeIn(myObject, 'customPublish', 'customSubscribe');
+    PubSubA.MicroPubSub.includeIn(myObject, 'customPublish', 'customSubscribe');
 
     myObject.customSubscribe(function(val) {
       expect(val).toBe(true);

@@ -12,21 +12,18 @@ module PubSubA {
     }
 
     public subscribe: (fn: ISubscriptionFunc<T>) => ISubscriptionToken;
-    public on: (fn: ISubscriptionFunc<T>) => ISubscriptionToken;
     public publish: (payload: T) => void;
-    public trigger: (payload: T) => void;
 
     constructor () {
-      var localPubSub = PubSubA.create('local');
-      localPubSub.channel('i', (channel, ctx) => { this.channel = channel; });
+      var pubsub = new PubSubA.MicroPubSub();
+      this.channel = pubsub.channel('__i', undefined);
 
-      this.subscribe = this.on = this._subscribe.bind(this);
-      this.publish = this.trigger = this._publish.bind(this);
+      this.subscribe = this._subscribe.bind(this);
+      this.publish = this._publish.bind(this);
     }
-    
   }
 
-  export function includeIn(
+  export function internalIncludeIn(
     obj: Object,
     publishName: string = 'publish',
     subscribeName: string = 'subscribe'

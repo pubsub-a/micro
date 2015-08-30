@@ -60,6 +60,10 @@ module PubSubA {
         callback(channel, this);
       return channel;
     }
+
+    public static includeIn (obj: any, publish_name?: string, subscribe_name?: string): any {
+      return PubSubA.internalIncludeIn(obj, publish_name, subscribe_name);
+    }
   }
 
   class Publisher<T> implements PubSubA.InternalInterfaces.IPublisher<T> {
