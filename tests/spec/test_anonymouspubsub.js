@@ -40,5 +40,27 @@ describe('Anonymous PubSub', function() {
     myObject.customPublish (true);
 
   });
+  it ('should be able to maintain the this-scope in a monkey-patched object', function(done) {
+    var myObject = function(){
+      this.foo = 'bar';
+      PubSubA.MicroPubSub.includeIn(this);
+    };
+
+    myObject.prototype.sub = function() {
+      this.subscribe(function(val) {
+        expect(val).toBe(true);
+        done();
+      });
+    };
+
+    myObject.prototype.pub = function() {
+      this.publish(true);
+    };
+
+    var instance = new myObject();
+    instance.sub();
+    instance.pub();
+
+  });
 
 });
