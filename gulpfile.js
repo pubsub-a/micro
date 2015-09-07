@@ -35,25 +35,12 @@ gulp.task('uglify', function() {
 
 });
 
-var defaultTsProject = function() { return ts.createProject({
-    target: 'ES5',
-    sortOutput: true,
-    noExternalResolve: true,
-    declarationFiles: true,
-    typescript: typescript
-  });
-};
-
+var defaultTsProject = ts.createProject('tsconfig.json');
 
 gulp.task('tscompile-pubsub-micro', function() {
-  var tsResult = gulp.src([
-      'custom.d.ts',
-      './src/**/*.ts',
-
-      '../pubsub-interfaces/src/pubsub-interfaces.ts',
-    ])
+  var tsResult = defaultTsProject.src()
     .pipe(sourcemaps.init())
-    .pipe(ts(defaultTsProject()));
+    .pipe(ts(defaultTsProject));
 
   return merge([
     tsResult.dts
