@@ -1,10 +1,10 @@
 {
   "name": "pubsub-a-micro",
   "private": false,
-  "version": "0.0.1",
-  "main": "dist/pubsub-micro.js",
+  "version": "0.1.0",
   "description": "Reference PubSub/A implementation",
   "license": "MIT",
+  "main": "dist/pubsub-micro.js",
   "files": [
     "dist"
   ],
