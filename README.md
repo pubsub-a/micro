@@ -14,11 +14,21 @@ Building and Installation
 
 npm/bower packages not yet available :(
 
+Usage
+-----
+
+The `pubsub-a-micro.js` file in the `dist` folder is compiled as UMD module. You can `require()` it from your CommonJS or AMD setup, or include in the browser and access it via the `PubSubMicro` global variable.
+
 Syntax
 ------
 
 ```javascript
-var pubsub = new PubSubA.MicroPubSub();
+// when using as a global variable
+var pubsub = new PubSubMicro();
+//
+// alternatively using CommonJS/AMD:
+// var pubsub = require('pubsub-a-micro');
+
 var channel = pubsub.channel('myChannel');
 
 channel.subscribe('myTopic', function(arg) {
@@ -30,13 +40,19 @@ channel.publish('myTopic', { foo: 'bar' });
 // instead of topics, use object instance or DOM node
 var myObject = document.querySelector('#myDomNode');
 
-PubSubA.MicroPubSub.includeIn(myObject);
+PubSubMicro.includeIn(myObject);
 
 myObject.subscribe(function(arg) {
   console.log('received arg: ', arg);
 });
 
 myObject.publish({ foo: 'bar' });
+
+// you can rename the publish/subscribe functions to anything:
+var otherObject = {};
+PubSubMicro.includeIn(otherObject, 'myPublish', 'mySubscribe');
+otherObject.myPublish('Hello world!');
+
 
 ```
 

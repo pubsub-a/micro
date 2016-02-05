@@ -1,22 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="/examples/jquery.min.js"></script>
-    <script src="/dist/pubsub-micro.js"></script>
-    
+    <script src="/dist/pubsub-a-micro.js"></script>
+
     <script type="text/javascript">
-    $(document).ready(function() {
+    document.addEventListener('DOMContentLoaded', function () {
 
         var myObject = {};
 
-        // adds a .publish and .subscribe function to the object so we don't need any 
+        // adds a .publish and .subscribe function to the object so we don't need any
         // string topics
-        PubSubA.includeIn(myObject);
+        PubSubMicro.includeIn(myObject);
 
         // no .start() required for local usage...
         var subscription = myObject.subscribe(function(message) {
-            var div = $('<div>').text('Received message: ' + message);
-            $('body').append(div);
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode('Received message: ' + message));
+            document.body.appendChild(div);
         });
 
         setTimeout(function() {
