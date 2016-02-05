@@ -1,6 +1,6 @@
 import { IChannel, ISubscriptionFunc, ISubscriptionToken } from 'pubsub-a-interface';
-import { MicroPubSub } from './pubsub_micro';
-import { SubscriptionToken } from './subscription_token';
+import { MicroPubSub } from './pubsub-micro';
+import { SubscriptionToken } from './subscription-token';
 
 export class AnonymousPubSub<T> {
     private channel: IChannel;

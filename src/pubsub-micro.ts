@@ -10,10 +10,10 @@ IChannelReadyCallback,
 SubscriptionDisposedCallback
 } from 'pubsub-a-interface';
 
-import { internalIncludeIn } from './pubsub_anonymous';
+import { internalIncludeIn } from './pubsub-anonymous';
 import { BucketHash, IBucketHash } from './buckethash';
-import * as InternalInterfaces from './internal_interfaces';
-import { SubscriptionToken } from './subscription_token';
+import * as InternalInterfaces from './internal-interfaces';
+import { SubscriptionToken } from './subscription-token';
 
 export function invokeIfDefined(func: Function, ...args: any[]) {
     if (func) {

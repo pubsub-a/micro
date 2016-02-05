@@ -10,11 +10,11 @@
         "custom.d.ts",
 
         "src/buckethash.ts",
-        "src/internal_interfaces.ts",
-        "src/pubsub_anonymous.ts",
+        "src/internal-interfaces.ts",
+        "src/pubsub-anonymous.ts",
         "src/registry.ts",
-        "src/pubsub_micro.ts",
-        "src/subscription_token.ts",
+        "src/pubsub-micro.ts",
+        "src/subscription-token.ts",
         "src/util.ts"
     ]
 }
