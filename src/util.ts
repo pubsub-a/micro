@@ -1,16 +1,13 @@
-module PubSubA {
 
-  export class Util {
-    
-    public static randomString(length: number = 8): string
-    {
-      var text = '';
-      var allowedCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+export class Util {
 
-      for(var i=0; i < length; i++)
-        text += allowedCharacters.charAt(Math.floor(Math.random() * allowedCharacters.length));
+    public static randomString(length: number = 8): string {
+        var text = '';
+        var allowedCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
-      return text;
+        for (var i = 0; i < length; i++)
+            text += allowedCharacters.charAt(Math.floor(Math.random() * allowedCharacters.length));
+
+        return text;
     }
-  }
 }

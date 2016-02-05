@@ -28,9 +28,10 @@
     "karma-phantomjs2-launcher": "^0.1.5",
     "merge2": "^0.3.1",
     "phantomjs": "^1.9.16",
+    "pubsub-a-interface": "git+https://github.com/pubsub-a/pubsub-interfaces.git",
     "run-sequence": "^1.0.2",
     "tsd": "^0.5.7",
-    "typescript": "^1.6.2",
+    "typescript": "^1.7.5",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.0.0"
   },

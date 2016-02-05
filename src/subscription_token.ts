@@ -1,24 +1,23 @@
-module PubSubA {
+import { ISubscriptionToken, SubscriptionDisposedCallback, disposeFunction } from 'pubsub-a-interface';
 
-  export class SubscriptionToken implements ISubscriptionToken {
+export class SubscriptionToken implements ISubscriptionToken {
 
     public isDisposed: boolean = false;
     public count: number;
 
     private disposeFn: disposeFunction;
 
-    constructor (disposeFn: disposeFunction, count?: number) {
-      this.disposeFn = disposeFn;
-      this.count = count ? count : 0;
+    constructor(disposeFn: disposeFunction, count?: number) {
+        this.disposeFn = disposeFn;
+        this.count = count ? count : 0;
     }
 
-    dispose (callback?: SubscriptionDisposedCallback) {
-      if (this.isDisposed) {
-        throw new Error ('Subscription is already disposed');
-      }
+    dispose(callback?: SubscriptionDisposedCallback) {
+        if (this.isDisposed) {
+            throw new Error('Subscription is already disposed');
+        }
 
-      this.isDisposed = true;
-      return this.disposeFn(callback);
+        this.isDisposed = true;
+        return this.disposeFn(callback);
     }
-  }
 }

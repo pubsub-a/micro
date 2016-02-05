@@ -1,12 +1,13 @@
 {
     "compilerOptions": {
         "target": "ES5",
-        "declarationFiles": true,
-        "sourceMap": false 
+        "outDir": "dist",
+        "declaration": true,
+        "sourceMap": true,
+        "module": "commonjs"
     },
     "files": [
         "custom.d.ts",
-        "../pubsub-interfaces/dist/pubsub-a-interface.d.ts",
 
         "src/buckethash.ts",
         "src/internal_interfaces.ts",
