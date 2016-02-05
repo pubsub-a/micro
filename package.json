@@ -7,7 +7,7 @@
   "main": "dist/pubsub-a-micro.js",
   "files": [
     "dist/pubsub-a-micro.js",
-    "dist/pubsub-a-micro.min.js",
+    "dist/pubsub-a-micro.min.js"
   ],
   "devDependencies": {
     "gulp": "^3.8.11",
