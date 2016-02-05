@@ -10,18 +10,17 @@ IChannelReadyCallback,
 SubscriptionDisposedCallback
 } from 'pubsub-a-interface';
 
-import { internalIncludeIn } from './pubsub-anonymous';
 import { BucketHash, IBucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 
-export function invokeIfDefined(func: Function, ...args: any[]) {
+function invokeIfDefined(func: Function, ...args: any[]) {
     if (func) {
         func.apply(func, args);
     }
 }
 
-export class ChannelStatic {
+class ChannelStatic {
 
     // publish & subscribe are stubs that MUST be implemented by the deriving class
     publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void {
@@ -49,7 +48,7 @@ export class ChannelStatic {
     }
 }
 
-export class MicroPubSub implements IPubSub {
+export default class PubSub implements IPubSub {
 
     private subscriptionCache;
 
@@ -75,6 +74,42 @@ export class MicroPubSub implements IPubSub {
     public static includeIn(obj: any, publish_name?: string, subscribe_name?: string): any {
         return internalIncludeIn(obj, publish_name, subscribe_name);
     }
+}
+
+
+class AnonymousPubSub<T> {
+    private channel: IChannel;
+
+    private _subscribe(fn: ISubscriptionFunc<T>) {
+        return this.channel.subscribe('a', fn);
+    }
+
+    private _publish(payload: T) {
+        return this.channel.publish('a', payload);
+    }
+
+    public subscribe: (fn: ISubscriptionFunc<T>) => ISubscriptionToken;
+    public publish: (payload: T) => void;
+
+    constructor() {
+        var pubsub = new PubSub();
+        this.channel = pubsub.channel('__i', undefined);
+
+        this.subscribe = this._subscribe.bind(this);
+        this.publish = this._publish.bind(this);
+    }
+}
+
+function internalIncludeIn(
+    obj: Object,
+    publishName: string = 'publish',
+    subscribeName: string = 'subscribe'
+) {
+    // TODO obj must be instanceof/child of Object ?
+    var pubsub = new AnonymousPubSub();
+    obj[subscribeName] = pubsub.subscribe;
+    obj[publishName] = pubsub.publish;
+    return obj;
 }
 
 class Publisher<T> implements InternalInterfaces.IPublisher<T> {

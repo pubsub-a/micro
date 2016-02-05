@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var gutil = require('gulp-util');
 var concat = require('gulp-concat');
 var ts = require('gulp-typescript');
 var source = require('vinyl-source-stream');
@@ -12,6 +13,7 @@ var typescript = require('typescript');
 var merge = require('merge2');
 var download = require('gulp-download');
 var karma = require('karma').server;
+var webpack = require('webpack');
 
 gulp.task('watch', function() {
   watch([
@@ -21,6 +23,15 @@ gulp.task('watch', function() {
   ], function() { gulp.start('tscompile-pubsub-micro'); });
 });
 
+gulp.task("webpack", function(callback) {
+  // run webpack
+  webpack(require('./webpack.config.js'), function(err, stats) {
+    if(err) throw new gutil.PluginError("webpack", err);
+        gutil.log("[webpack]", stats.toString());
+        callback();
+    });
+});
+
 gulp.task('uglify', function() {
 
   return gulp.src([
@@ -28,7 +39,7 @@ gulp.task('uglify', function() {
     '!./dist/**/*.min.js'
   ])
   .pipe(rename(function(path) {
-    path.extname = '.min.js'; 
+    path.extname = '.min.js';
   }))
   .pipe(uglify())
   .pipe(gulp.dest('./dist/'));
@@ -44,11 +55,9 @@ gulp.task('tscompile-pubsub-micro', function() {
 
   return merge([
     tsResult.dts
-      .pipe(concat('pubsub-micro.d.ts'))
       .pipe(gulp.dest('./dist/')),
 
     tsResult.js
-      .pipe(concat('pubsub-micro.js'))
       // .pipe(sourcemaps.write())
       .pipe(gulp.dest('./dist/'))
     ]);
@@ -74,6 +83,7 @@ gulp.task('release', function() {
   // run uglify after all other tasks
   runSequence(
     'tscompile-pubsub-micro',
+    'webpack',
     'uglify'
   );
 });
