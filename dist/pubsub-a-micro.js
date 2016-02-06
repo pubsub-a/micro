@@ -63,7 +63,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = pubsub.default;
 
 
-
 /***/ },
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
@@ -84,19 +83,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        func.apply(func, args);
 	    }
 	}
-	var ChannelStatic = (function () {
-	    function ChannelStatic() {
+	var ChannelBlueprint = (function () {
+	    function ChannelBlueprint() {
 	    }
 	    // publish & subscribe are stubs that MUST be implemented by the deriving class
-	    ChannelStatic.prototype.publish = function (topic, payload, callback) {
+	    ChannelBlueprint.prototype.publish = function (topic, payload, callback) {
 	        throw new Error('This method must be override by implementations');
 	    };
-	    ChannelStatic.prototype.subscribe = function (topic, subscription, callback) {
+	    ChannelBlueprint.prototype.subscribe = function (topic, subscription, callback) {
 	        throw new Error('This method must be override by implementations');
 	    };
 	    // The following code should only be overriden in rare cases, you should not implement/override
 	    // beyond this point!
-	    ChannelStatic.prototype.once = function (topic, subscription, callback) {
+	    ChannelBlueprint.prototype.once = function (topic, subscription, callback) {
 	        var internal_subs;
 	        var wrapperInnerFunc = function (payload) {
 	            internal_subs.dispose();
@@ -106,7 +105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        internal_subs = this.subscribe(topic, wrapperFunc, callback);
 	        return internal_subs;
 	    };
-	    return ChannelStatic;
+	    return ChannelBlueprint;
 	})();
 	var PubSub = (function () {
 	    function PubSub() {
@@ -127,6 +126,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    PubSub.includeIn = function (obj, publish_name, subscribe_name) {
 	        return internalIncludeIn(obj, publish_name, subscribe_name);
 	    };
+	    /**
+	     * Helper functions that expose some internals that are reused in sister projects
+	     */
+	    PubSub.BucketHash = buckethash_1.BucketHash;
+	    PubSub.ChannelBlueprint = ChannelBlueprint;
 	    return PubSub;
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -205,7 +209,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return subscriptionHandle;
 	    };
 	    return Channel;
-	})(ChannelStatic);
+	})(ChannelBlueprint);
 
 
 /***/ },

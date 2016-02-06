@@ -6,13 +6,12 @@ module.exports = {
         root: path.resolve('./dist/src/'),
         extensions: ['', '.json', '.js']
     },
-    output:
-        {
-            path: __dirname + '/dist/',
-            filename: 'pubsub-a-micro.js',
+    output: {
+        path: __dirname + '/dist/',
+        filename: 'pubsub-a-micro.js',
 
-            // will be the global variable that the autobahn.js file exports to
-            library: 'PubSubMicro',
-            libraryTarget: 'umd'
-        }
+        // will be the global variable that the autobahn.js file exports to
+        library: 'PubSubMicro',
+        libraryTarget: 'umd'
+    }
 };

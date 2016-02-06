@@ -20,7 +20,7 @@ function invokeIfDefined(func: Function, ...args: any[]) {
     }
 }
 
-class ChannelStatic {
+class ChannelBlueprint {
 
     // publish & subscribe are stubs that MUST be implemented by the deriving class
     publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void {
@@ -74,6 +74,12 @@ export default class PubSub implements IPubSub {
     public static includeIn(obj: any, publish_name?: string, subscribe_name?: string): any {
         return internalIncludeIn(obj, publish_name, subscribe_name);
     }
+
+    /**
+     * Helper functions that expose some internals that are reused in sister projects
+     */
+    public static BucketHash = BucketHash;
+    public static ChannelBlueprint: any = ChannelBlueprint;
 }
 
 
@@ -143,7 +149,7 @@ class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
     }
 }
 
-class Channel extends ChannelStatic implements IChannel {
+class Channel extends ChannelBlueprint implements IChannel {
     constructor(public name: string, private cache: IBucketHash<ISubscriptionFunc<any>>) {
         super();
         this.name = name;

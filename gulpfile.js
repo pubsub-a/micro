@@ -20,7 +20,9 @@ gulp.task('watch', function() {
     'src/**/*.ts',
     'src/custom.d.ts',
     'gulpfile.js',
-  ], function() { gulp.start('tscompile-pubsub-micro'); });
+  ], function() {
+    gulp.start('tscompile-pubsub-micro')
+  });
 });
 
 gulp.task("webpack", function(callback) {
