@@ -52,6 +52,7 @@ export default class PubSub implements IPubSub {
      */
     public static BucketHash = BucketHash;
     public static invokeIfDefined: any = invokeIfDefined;
+    public static SubscriptionToken: any = SubscriptionToken;
 }
 
 

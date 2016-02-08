@@ -103,6 +103,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    PubSub.BucketHash = buckethash_1.BucketHash;
 	    PubSub.invokeIfDefined = invokeIfDefined;
+	    PubSub.SubscriptionToken = subscription_token_1.SubscriptionToken;
 	    return PubSub;
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
