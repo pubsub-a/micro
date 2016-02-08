@@ -1,5 +1,5 @@
 
-export class Util {
+export default class Util {
 
     public static randomString(length: number = 8): string {
         var text = '';

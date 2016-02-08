@@ -13,6 +13,7 @@ SubscriptionDisposedCallback
 import { BucketHash, IBucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
+import Util from './util';
 
 function invokeIfDefined(func: Function, ...args: any[]) {
     if (func) {
@@ -53,6 +54,7 @@ export default class PubSub implements IPubSub {
     public static BucketHash = BucketHash;
     public static invokeIfDefined: any = invokeIfDefined;
     public static SubscriptionToken: any = SubscriptionToken;
+    public static Util: any = Util;
 }
 
 

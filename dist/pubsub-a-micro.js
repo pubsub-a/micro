@@ -70,6 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var buckethash_1 = __webpack_require__(2);
 	var subscription_token_1 = __webpack_require__(3);
+	var util_1 = __webpack_require__(4);
 	function invokeIfDefined(func) {
 	    var args = [];
 	    for (var _i = 1; _i < arguments.length; _i++) {
@@ -104,6 +105,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    PubSub.BucketHash = buckethash_1.BucketHash;
 	    PubSub.invokeIfDefined = invokeIfDefined;
 	    PubSub.SubscriptionToken = subscription_token_1.SubscriptionToken;
+	    PubSub.Util = util_1.default;
 	    return PubSub;
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -284,6 +286,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return SubscriptionToken;
 	})();
 	exports.SubscriptionToken = SubscriptionToken;
+
+
+/***/ },
+/* 4 */
+/***/ function(module, exports) {
+
+	var Util = (function () {
+	    function Util() {
+	    }
+	    Util.randomString = function (length) {
+	        if (length === void 0) { length = 8; }
+	        var text = '';
+	        var allowedCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	        for (var i = 0; i < length; i++)
+	            text += allowedCharacters.charAt(Math.floor(Math.random() * allowedCharacters.length));
+	        return text;
+	    };
+	    return Util;
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
+	exports.default = Util;
 
 
 /***/ }
