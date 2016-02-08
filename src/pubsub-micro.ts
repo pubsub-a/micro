@@ -20,34 +20,6 @@ function invokeIfDefined(func: Function, ...args: any[]) {
     }
 }
 
-class ChannelBlueprint {
-
-    // publish & subscribe are stubs that MUST be implemented by the deriving class
-    publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void {
-        throw new Error('This method must be override by implementations');
-    }
-
-    subscribe<T>(topic: string, subscription: ISubscriptionFunc<T>, callback?: Function)
-        : ISubscriptionToken {
-        throw new Error('This method must be override by implementations');
-    }
-
-    // The following code should only be overriden in rare cases, you should not implement/override
-    // beyond this point!
-
-    once<T>(topic: string, subscription: ISubscriptionFunc<T>, callback?: Function)
-        : ISubscriptionToken {
-        var internal_subs;
-        var wrapperInnerFunc = (payload: T) => {
-            internal_subs.dispose();
-            subscription(payload);
-        };
-        var wrapperFunc = wrapperInnerFunc.bind(subscription);
-        internal_subs = this.subscribe<T>(topic, wrapperFunc, callback);
-        return internal_subs;
-    }
-}
-
 export default class PubSub implements IPubSub {
 
     private subscriptionCache;
@@ -79,7 +51,6 @@ export default class PubSub implements IPubSub {
      * Helper functions that expose some internals that are reused in sister projects
      */
     public static BucketHash = BucketHash;
-    public static ChannelBlueprint: any = ChannelBlueprint;
     public static invokeIfDefined: any = invokeIfDefined;
 }
 
@@ -150,9 +121,8 @@ class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
     }
 }
 
-class Channel extends ChannelBlueprint implements IChannel {
+class Channel implements IChannel {
     constructor(public name: string, private cache: IBucketHash<ISubscriptionFunc<any>>) {
-        super();
         this.name = name;
     }
 
@@ -170,6 +140,18 @@ class Channel extends ChannelBlueprint implements IChannel {
 
         invokeIfDefined(callback, subscriptionHandle, topic, subscription);
         return subscriptionHandle;
+    }
+
+    once<T>(topic: string, subscription: ISubscriptionFunc<T>, callback?: Function)
+        : ISubscriptionToken {
+        var internal_subs;
+        var wrapperInnerFunc = (payload: T) => {
+            internal_subs.dispose();
+            subscription(payload);
+        };
+        var wrapperFunc = wrapperInnerFunc.bind(subscription);
+        internal_subs = this.subscribe<T>(topic, wrapperFunc, callback);
+        return internal_subs;
     }
 
 }

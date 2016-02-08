@@ -68,11 +68,6 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
 	var buckethash_1 = __webpack_require__(2);
 	var subscription_token_1 = __webpack_require__(3);
 	function invokeIfDefined(func) {
@@ -84,30 +79,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        func.apply(func, args);
 	    }
 	}
-	var ChannelBlueprint = (function () {
-	    function ChannelBlueprint() {
-	    }
-	    // publish & subscribe are stubs that MUST be implemented by the deriving class
-	    ChannelBlueprint.prototype.publish = function (topic, payload, callback) {
-	        throw new Error('This method must be override by implementations');
-	    };
-	    ChannelBlueprint.prototype.subscribe = function (topic, subscription, callback) {
-	        throw new Error('This method must be override by implementations');
-	    };
-	    // The following code should only be overriden in rare cases, you should not implement/override
-	    // beyond this point!
-	    ChannelBlueprint.prototype.once = function (topic, subscription, callback) {
-	        var internal_subs;
-	        var wrapperInnerFunc = function (payload) {
-	            internal_subs.dispose();
-	            subscription(payload);
-	        };
-	        var wrapperFunc = wrapperInnerFunc.bind(subscription);
-	        internal_subs = this.subscribe(topic, wrapperFunc, callback);
-	        return internal_subs;
-	    };
-	    return ChannelBlueprint;
-	})();
 	var PubSub = (function () {
 	    function PubSub() {
 	        this.subscriptionCache = new buckethash_1.BucketHash();
@@ -131,7 +102,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * Helper functions that expose some internals that are reused in sister projects
 	     */
 	    PubSub.BucketHash = buckethash_1.BucketHash;
-	    PubSub.ChannelBlueprint = ChannelBlueprint;
 	    PubSub.invokeIfDefined = invokeIfDefined;
 	    return PubSub;
 	})();
@@ -191,10 +161,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    return Subscriber;
 	})();
-	var Channel = (function (_super) {
-	    __extends(Channel, _super);
+	var Channel = (function () {
 	    function Channel(name, cache) {
-	        _super.call(this);
 	        this.name = name;
 	        this.cache = cache;
 	        this.name = name;
@@ -210,8 +178,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        invokeIfDefined(callback, subscriptionHandle, topic, subscription);
 	        return subscriptionHandle;
 	    };
+	    Channel.prototype.once = function (topic, subscription, callback) {
+	        var internal_subs;
+	        var wrapperInnerFunc = function (payload) {
+	            internal_subs.dispose();
+	            subscription(payload);
+	        };
+	        var wrapperFunc = wrapperInnerFunc.bind(subscription);
+	        internal_subs = this.subscribe(topic, wrapperFunc, callback);
+	        return internal_subs;
+	    };
 	    return Channel;
-	})(ChannelBlueprint);
+	})();
 
 
 /***/ },

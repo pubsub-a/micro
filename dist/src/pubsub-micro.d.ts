@@ -11,6 +11,5 @@ export default class PubSub implements IPubSub {
      * Helper functions that expose some internals that are reused in sister projects
      */
     static BucketHash: typeof BucketHash;
-    static ChannelBlueprint: any;
     static invokeIfDefined: any;
 }
