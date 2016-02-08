@@ -80,6 +80,7 @@ export default class PubSub implements IPubSub {
      */
     public static BucketHash = BucketHash;
     public static ChannelBlueprint: any = ChannelBlueprint;
+    public static invokeIfDefined: any = invokeIfDefined;
 }
 
 

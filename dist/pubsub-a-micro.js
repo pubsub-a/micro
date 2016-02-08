@@ -132,6 +132,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    PubSub.BucketHash = buckethash_1.BucketHash;
 	    PubSub.ChannelBlueprint = ChannelBlueprint;
+	    PubSub.invokeIfDefined = invokeIfDefined;
 	    return PubSub;
 	})();
 	Object.defineProperty(exports, "__esModule", { value: true });
