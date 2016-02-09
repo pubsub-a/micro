@@ -84,7 +84,6 @@ gulp.task('release', function() {
   // run uglify after all other tasks
   runSequence(
     'tscompile-pubsub-micro',
-    'webpack',
     'uglify'
   );
 });
