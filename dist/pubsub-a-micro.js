@@ -60,7 +60,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	*/
 
 	var pubsub = __webpack_require__(1);
-	module.exports = pubsub.default;
+	module.exports = pubsub;
 
 
 
