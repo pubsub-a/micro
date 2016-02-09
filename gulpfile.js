@@ -37,8 +37,7 @@ gulp.task("webpack", function(callback) {
 gulp.task('uglify', function() {
 
   return gulp.src([
-    './dist/**/*.js',
-    '!./dist/**/*.min.js'
+    './dist/pubsub-a-micro.js',
   ])
   .pipe(rename(function(path) {
     path.extname = '.min.js';
