@@ -4,5 +4,5 @@
 */
 
 var pubsub = require('./pubsub-micro');
-module.exports = pubsub;
+module.exports = pubsub.default;
 

@@ -12,6 +12,12 @@ module.exports = {
 
         // will be the global variable that the autobahn.js file exports to
         library: 'PubSubMicro',
-        libraryTarget: 'umd'
-    }
+        libraryTarget: 'var'
+    },
+    preLoaders: [
+        {
+            test: /\.js$/,
+            loader: "source-map-loader"
+        }
+    ]
 };

@@ -1,14 +1,5 @@
-(function webpackUniversalModuleDefinition(root, factory) {
-	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory();
-	else if(typeof define === 'function' && define.amd)
-		define([], factory);
-	else if(typeof exports === 'object')
-		exports["PubSubMicro"] = factory();
-	else
-		root["PubSubMicro"] = factory();
-})(this, function() {
-return /******/ (function(modules) { // webpackBootstrap
+var PubSubMicro =
+/******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 
@@ -60,7 +51,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	*/
 
 	var pubsub = __webpack_require__(1);
-	module.exports = pubsub;
+	module.exports = pubsub.default;
 
 
 
@@ -310,6 +301,4 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }
-/******/ ])
-});
-;
+/******/ ]);
