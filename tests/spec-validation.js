@@ -3,16 +3,17 @@
  *  project (not to be confused with our own unit tests in the spec/ folder).
  */
 
-(function() {
-  var pubsub = new PubSubMicro();
-  var factory = function(reset) {
+var PubSubMicro = require("../dist/src/pubsub-micro");
+
+var pubsub = new PubSubMicro.default();
+
+var factory = function(reset) {
     if (reset === true || reset === undefined)
-      pubsub = new PubSubMicro();
-
+        pubsub = new PubSubMicro.default();
     return pubsub;
-  };
+};
 
-  // if run in the context of another test suite, we make a factory known that exports our implementation
-  window.registerFactory('PubSubMicro', factory);
-
-})();
+module.exports = {
+    factory: factory,
+    name: "PubSubMicro"
+};
