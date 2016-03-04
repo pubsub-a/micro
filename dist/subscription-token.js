@@ -14,3 +14,4 @@ var SubscriptionToken = (function () {
     return SubscriptionToken;
 })();
 exports.SubscriptionToken = SubscriptionToken;
+//# sourceMappingURL=subscription-token.js.map

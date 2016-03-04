@@ -16,3 +16,4 @@ function getProvider() {
     return provider;
 }
 exports.getProvider = getProvider;
+//# sourceMappingURL=registry.js.map

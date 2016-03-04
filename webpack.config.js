@@ -1,13 +1,13 @@
 var path = require('path');
 module.exports = {
     target: 'web',
-    entry: 'pubsub-micro-webpack.js',
+    entry: 'pubsub-micro.js',
     resolve: {
-        root: path.resolve('./dist/src/'),
+        root: path.resolve('./dist/'),
         extensions: ['', '.json', '.js']
     },
     output: {
-        path: __dirname + '/dist/',
+        path: __dirname + '/dist/bundle/',
         filename: 'pubsub-a-micro.js',
 
         // will be the global variable that the autobahn.js file exports to

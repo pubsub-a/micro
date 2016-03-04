@@ -10,36 +10,17 @@
     "dist"
   ],
   "devDependencies": {
-    "gulp": "^3.8.11",
-    "gulp-concat": "^2.4.3",
-    "gulp-download": "0.0.1",
-    "gulp-rename": "^1.2.0",
-    "gulp-sourcemaps": "^1.3.0",
-    "gulp-typescript": "^2.9.0",
-    "gulp-uglify": "^1.1.0",
-    "gulp-util": "^3.0.7",
-    "gulp-watch": "^4.1.1",
-    "jasmine-core": "^2.2.0",
-    "jasmine-node": "^1.14.5",
-    "karma": "^0.12.31",
-    "karma-chrome-launcher": "^0.1.7",
-    "karma-cli": "0.0.4",
-    "karma-firefox-launcher": "^0.1.4",
-    "karma-jasmine": "^0.3.5",
-    "karma-jasmine-html-reporter": "^0.1.7",
-    "karma-phantomjs2-launcher": "^0.1.5",
-    "merge2": "^0.3.1",
-    "phantomjs": "^1.9.16",
     "pubsub-a-interface": "git+https://github.com/pubsub-a/pubsub-interfaces.git",
-    "run-sequence": "^1.0.2",
     "source-map-loader": "^0.1.5",
     "tsd": "^0.5.7",
     "typescript": "^1.7.5",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.0.0",
+    "uglifyjs": "^2.4.10",
     "webpack": "^1.12.13"
   },
   "scripts": {
-    "prestart": "npm install"
+    "build": "npm run compile && npm run bundle && npm run uglify",
+    "compile": "tsc",
+    "bundle": "webpack",
+    "uglify": "uglifyjs -o dist/bundle/pubsub-a-micro.min.js dist/bundle/pubsub-a-micro.js"
   }
 }

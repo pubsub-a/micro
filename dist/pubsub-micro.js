@@ -123,3 +123,4 @@ var Channel = (function () {
     };
     return Channel;
 })();
+//# sourceMappingURL=pubsub-micro.js.map
