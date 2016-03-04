@@ -8,4 +8,4 @@ install:
 
 script:
   # compile main source
-  - ./node_modules/.bin/gulp
+  - npm run build
