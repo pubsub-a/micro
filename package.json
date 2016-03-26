@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "description": "Reference PubSub/A implementation",
   "license": "MIT",
-  "main": "dist/src/pubsub-micro.js",
-  "typings": "dist/src/pubsub-micro.d.ts",
+  "main": "dist/pubsub-micro.js",
+  "typings": "dist/pubsub-micro.d.ts",
   "files": [
     "dist"
   ],
