@@ -10,6 +10,8 @@ function invokeIfDefined(func) {
         func.apply(func, args);
     }
 }
+var buckethash_2 = require("./buckethash");
+exports.BucketHash = buckethash_2.BucketHash;
 var PubSub = (function () {
     function PubSub() {
         this.subscriptionCache = new buckethash_1.BucketHash();
@@ -38,8 +40,7 @@ var PubSub = (function () {
     PubSub.Util = util_1.default;
     return PubSub;
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.default = PubSub;
+exports.PubSub = PubSub;
 var AnonymousPubSub = (function () {
     function AnonymousPubSub() {
         var pubsub = new PubSub();

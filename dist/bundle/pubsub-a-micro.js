@@ -57,6 +57,8 @@ var PubSubMicro =
 	        func.apply(func, args);
 	    }
 	}
+	var buckethash_2 = __webpack_require__(1);
+	exports.BucketHash = buckethash_2.BucketHash;
 	var PubSub = (function () {
 	    function PubSub() {
 	        this.subscriptionCache = new buckethash_1.BucketHash();
@@ -85,8 +87,7 @@ var PubSubMicro =
 	    PubSub.Util = util_1.default;
 	    return PubSub;
 	})();
-	Object.defineProperty(exports, "__esModule", { value: true });
-	exports.default = PubSub;
+	exports.PubSub = PubSub;
 	var AnonymousPubSub = (function () {
 	    function AnonymousPubSub() {
 	        var pubsub = new PubSub();

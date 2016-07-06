@@ -10,6 +10,11 @@
     "dist"
   ],
   "devDependencies": {
+    "chai": "^3.5.0",
+    "karma": "^1.1.1",
+    "karma-chai": "^0.1.0",
+    "karma-mocha": "^1.1.1",
+    "mocha": "^2.5.3",
     "pubsub-a-interface": "git+https://github.com/pubsub-a/pubsub-interfaces.git",
     "source-map-loader": "^0.1.5",
     "tsd": "^0.5.7",

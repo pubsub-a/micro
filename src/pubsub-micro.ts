@@ -21,7 +21,9 @@ function invokeIfDefined(func: Function, ...args: any[]) {
     }
 }
 
-export default class PubSub implements IPubSub {
+export {BucketHash} from "./buckethash";
+
+export class PubSub implements IPubSub {
 
     private subscriptionCache;
 

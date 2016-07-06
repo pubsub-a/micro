@@ -1,6 +1,7 @@
 import { IPubSub, IChannel, IPubSubStartCallback, IPubSubStopCallback, IChannelReadyCallback } from 'pubsub-a-interface';
 import { BucketHash } from './buckethash';
-export default class PubSub implements IPubSub {
+export { BucketHash } from "./buckethash";
+export declare class PubSub implements IPubSub {
     private subscriptionCache;
     constructor();
     start(callback?: IPubSubStartCallback): void;

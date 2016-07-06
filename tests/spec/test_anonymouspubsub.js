@@ -1,3 +1,9 @@
+if (typeof window === "undefined") {
+  var PubSubMicro = require("../../dist/pubsub-micro").PubSub;
+  var expect = require("chai").expect;
+} else {
+  var PubSubMicro = PubSubMicro.PubSub;
+}
 
 describe('Anonymous PubSub', function() {
   var hub = {};
@@ -7,11 +13,11 @@ describe('Anonymous PubSub', function() {
 
   it ('should trigger a subscription and return a count', function(done) {
     var token = hub.subscribe(function(val) {
-      expect(val).toBe(true);
+      expect(val).to.equal(true);
       done();
     });
 
-    expect(token.count).toBe(1);
+    expect(token.count).to.equal(1);
     hub.publish(true);
 
   });
@@ -21,7 +27,7 @@ describe('Anonymous PubSub', function() {
     PubSubMicro.includeIn(myObject);
 
     myObject.subscribe(function(val) {
-      expect(val).toBe(true);
+      expect(val).to.equal(true);
       done();
     });
 
@@ -33,7 +39,7 @@ describe('Anonymous PubSub', function() {
     PubSubMicro.includeIn(myObject, 'customPublish', 'customSubscribe');
 
     myObject.customSubscribe(function(val) {
-      expect(val).toBe(true);
+      expect(val).to.equal(true);
       done();
     });
 
@@ -48,7 +54,7 @@ describe('Anonymous PubSub', function() {
 
     myObject.prototype.sub = function() {
       this.subscribe(function(val) {
-        expect(val).toBe(true);
+        expect(val).to.equal(true);
         done();
       });
     };
