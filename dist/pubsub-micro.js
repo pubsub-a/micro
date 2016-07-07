@@ -101,13 +101,20 @@ var Channel = (function () {
         this.cache = cache;
         this.name = name;
     }
+    Channel.prototype.encodeTopic = function (topic) {
+        if (topic.indexOf("%") !== -1) {
+            throw "The percent character (%) is not allowed in topic names";
+        }
+        var encodedTopic = this.name + "%" + topic;
+        return encodedTopic;
+    };
     Channel.prototype.publish = function (topic, payload, callback) {
-        var publisher = new Publisher(topic, this.cache);
+        var publisher = new Publisher(this.encodeTopic(topic), this.cache);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
     };
     Channel.prototype.subscribe = function (topic, subscription, callback) {
-        var subscriber = new Subscriber(topic, this.cache);
+        var subscriber = new Subscriber(this.encodeTopic(topic), this.cache);
         var subscriptionHandle = subscriber.subscribe(subscription);
         invokeIfDefined(callback, subscriptionHandle, topic, subscription);
         return subscriptionHandle;
@@ -119,7 +126,7 @@ var Channel = (function () {
             subscription(payload);
         };
         var wrapperFunc = wrapperInnerFunc.bind(subscription);
-        internal_subs = this.subscribe(topic, wrapperFunc, callback);
+        internal_subs = this.subscribe(this.encodeTopic(topic), wrapperFunc, callback);
         return internal_subs;
     };
     return Channel;

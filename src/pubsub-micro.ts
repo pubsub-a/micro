@@ -20,7 +20,6 @@ function invokeIfDefined(func: Function, ...args: any[]) {
         func.apply(func, args);
     }
 }
-
 export {BucketHash} from "./buckethash";
 
 export class PubSub implements IPubSub {
@@ -131,8 +130,17 @@ class Channel implements IChannel {
         this.name = name;
     }
 
+    private encodeTopic(topic): string {
+        if (topic.indexOf("%") !==  -1) {
+            throw "The percent character (%) is not allowed in topic names";
+        }
+
+        const encodedTopic = `${this.name}%${topic}`;
+        return encodedTopic;
+    }
+
     publish<T>(topic: string, payload: T, callback?: Function) {
-        var publisher = new Publisher<T>(topic, this.cache);
+        var publisher = new Publisher<T>(this.encodeTopic(topic), this.cache);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
     }
@@ -140,7 +148,7 @@ class Channel implements IChannel {
     subscribe<T>(topic: string, subscription: ISubscriptionFunc<T>, callback?: Function)
         : ISubscriptionToken {
 
-        var subscriber = new Subscriber<T>(topic, this.cache);
+        var subscriber = new Subscriber<T>(this.encodeTopic(topic), this.cache);
         var subscriptionHandle = subscriber.subscribe(subscription);
 
         invokeIfDefined(callback, subscriptionHandle, topic, subscription);
@@ -155,7 +163,7 @@ class Channel implements IChannel {
             subscription(payload);
         };
         var wrapperFunc = wrapperInnerFunc.bind(subscription);
-        internal_subs = this.subscribe<T>(topic, wrapperFunc, callback);
+        internal_subs = this.subscribe<T>(this.encodeTopic(topic), wrapperFunc, callback);
         return internal_subs;
     }
 
