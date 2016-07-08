@@ -26,6 +26,9 @@
     "build": "npm run compile && npm run bundle && npm run uglify",
     "compile": "tsc",
     "bundle": "webpack",
+    "node-tests": "mocha tests/spec/*.js",
+    "browser-tests": "karma start",
+    "tests": "npm run node-tests && npm run browser-tests",
     "uglify": "uglifyjs -o dist/bundle/pubsub-a-micro.min.js dist/bundle/pubsub-a-micro.js"
   }
 }

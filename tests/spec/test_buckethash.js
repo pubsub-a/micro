@@ -1,5 +1,5 @@
 if (typeof window === "undefined") {
-  var BucketHash = require("../../dist/buckethash").BucketHash;
+  var BucketHash = require("../../dist/pubsub-micro").BucketHash;
   var expect = require("chai").expect;
 } else {
   var BucketHash = PubSubMicro.BucketHash;

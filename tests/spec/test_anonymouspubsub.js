@@ -1,14 +1,14 @@
 if (typeof window === "undefined") {
-  var PubSubMicro = require("../../dist/pubsub-micro").PubSub;
+  var PubSub = require("../../dist/pubsub-micro").PubSub;
   var expect = require("chai").expect;
 } else {
-  var PubSubMicro = PubSubMicro.PubSub;
+  var PubSub = PubSubMicro.PubSub;
 }
 
 describe('Anonymous PubSub', function() {
   var hub = {};
   beforeEach(function() {
-    PubSubMicro.includeIn(hub);
+    PubSub.includeIn(hub);
   });
 
   it ('should trigger a subscription and return a count', function(done) {
@@ -24,7 +24,7 @@ describe('Anonymous PubSub', function() {
 
   it ('should be able to monkey-patch an existing object', function(done) {
     var myObject = {};
-    PubSubMicro.includeIn(myObject);
+    PubSub.includeIn(myObject);
 
     myObject.subscribe(function(val) {
       expect(val).to.equal(true);
@@ -36,7 +36,7 @@ describe('Anonymous PubSub', function() {
   });
   it ('should be able to monkey-patch an existing object with custom function names', function(done) {
     var myObject = {};
-    PubSubMicro.includeIn(myObject, 'customPublish', 'customSubscribe');
+    PubSub.includeIn(myObject, 'customPublish', 'customSubscribe');
 
     myObject.customSubscribe(function(val) {
       expect(val).to.equal(true);
@@ -49,7 +49,7 @@ describe('Anonymous PubSub', function() {
   it ('should be able to maintain the this-scope in a monkey-patched object', function(done) {
     var myObject = function(){
       this.foo = 'bar';
-      PubSubMicro.includeIn(this);
+      PubSub.includeIn(this);
     };
 
     myObject.prototype.sub = function() {
