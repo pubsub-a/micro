@@ -48,5 +48,10 @@ export declare class BucketHash<T> implements IBucketHash<T> {
      * @return {number}      The number of items in the bucket AFTER the element has been removed.
      */
     remove(key: string, item?: T): number;
-    private removeFromArray(arr, item);
+    /**
+     * A helper function to remove an element from an array.
+     * @param {Array<any>} arr  [description]
+     * @param {any}        item [description]
+     */
+    private removeFromArray<T>(arr, item);
 }

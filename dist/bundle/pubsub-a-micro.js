@@ -252,7 +252,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {string} key [description]
 	     */
 	    BucketHash.prototype.clear = function (key) {
-	        var result = this.get(key);
 	        this.remove(key);
 	    };
 	    /**
@@ -282,6 +281,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            delete this.dict[encodedKey];
 	        return bucket.length;
 	    };
+	    /**
+	     * A helper function to remove an element from an array.
+	     * @param {Array<any>} arr  [description]
+	     * @param {any}        item [description]
+	     */
 	    BucketHash.prototype.removeFromArray = function (arr, item) {
 	        var index = arr.indexOf(item);
 	        if (index >= 0)

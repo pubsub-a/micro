@@ -68,7 +68,6 @@ export class BucketHash<T> implements IBucketHash<T> {
      * @param {string} key [description]
      */
     clear(key: string): void {
-        var result = this.get(key);
         this.remove(key);
     }
 
@@ -106,7 +105,12 @@ export class BucketHash<T> implements IBucketHash<T> {
         return bucket.length;
     }
 
-    private removeFromArray(arr: Array<any>, item: any) {
+    /**
+     * A helper function to remove an element from an array.
+     * @param {Array<any>} arr  [description]
+     * @param {any}        item [description]
+     */
+    private removeFromArray<T>(arr: Array<T>, item: T) {
         var index = arr.indexOf(item);
 
         if (index >= 0)
