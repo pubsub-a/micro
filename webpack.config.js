@@ -8,7 +8,7 @@ module.exports = {
     },
     output: {
         path: __dirname + '/dist/bundle/',
-        filename: 'pubsub-a-micro.js',
+        filename: 'pubsub-a-micro.umd.js',
 
         // will be the global variable that the autobahn.js file exports to
         library: 'PubSubMicro',

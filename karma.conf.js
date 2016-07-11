@@ -15,7 +15,7 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'dist/bundle/pubsub-a-micro.js',
+      'dist/bundle/pubsub-a-micro.umd.js',
       'tests/spec/**/*.js'
     ],
 
