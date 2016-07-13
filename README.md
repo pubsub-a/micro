@@ -9,38 +9,44 @@ Building and Installation
 
 1. Checkout this repo.
 1. `npm install`
-1. `gulp`
+1. `npm run build`
 1. Find source in the `dist` folder
+1. Run tests: `npm run test` (optional)
 
 npm/bower packages not yet available :(
 
 Usage
 -----
 
-The `pubsub-a-micro.js` file in the `dist` folder is compiled as UMD module. You can `require()` it from your CommonJS or AMD setup, or include in the browser and access it via the `PubSubMicro` global variable.
+The `pubsub-a-micro.umd.js` file in the `dist/bundle` folder is compiled as UMD module. You can `require()` it from your CommonJS or AMD setup, or include in the browser and access it via the `PubSubMicro` global variable.
 
 Syntax
 ------
 
 ```javascript
-// when using as a global variable
-var pubsub = new PubSubMicro();
+// when using as a global variable by including via <script></script> tag
+var PubSub = new PubSubMicro.PubSub();
 //
 // alternatively using CommonJS/AMD:
-// var pubsub = require('pubsub-a-micro');
+// var PubSub = require('pubsub-a-micro').PubSub;
+//
+var pubsub = new PubSub();
+pubsub.start(function() {
+    pubsub.channel('myChannel', function(chan) {
+        // channels are initialize asynchronously, hence the callback
 
-var channel = pubsub.channel('myChannel');
+        chan.subscribe('myTopic', function(arg) {
+          console.log('received arg: ', arg);
+        });
 
-channel.subscribe('myTopic', function(arg) {
-  console.log('received arg: ', arg);
+        chan.publish('myTopic', { foo: 'bar' });
+    });
 });
-
-channel.publish('myTopic', { foo: 'bar' });
 
 // instead of topics, use object instance or DOM node
 var myObject = document.querySelector('#myDomNode');
 
-PubSubMicro.includeIn(myObject);
+PubSub.includeIn(myObject);
 
 myObject.subscribe(function(arg) {
   console.log('received arg: ', arg);
@@ -50,7 +56,7 @@ myObject.publish({ foo: 'bar' });
 
 // you can rename the publish/subscribe functions to anything:
 var otherObject = {};
-PubSubMicro.includeIn(otherObject, 'myPublish', 'mySubscribe');
+PubSub.includeIn(otherObject, 'myPublish', 'mySubscribe');
 otherObject.myPublish('Hello world!');
 
 
