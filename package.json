@@ -20,8 +20,7 @@
     "mocha": "^2.5.3",
     "pubsub-a-interface": "git+https://github.com/pubsub-a/pubsub-interfaces.git",
     "source-map-loader": "^0.1.5",
-    "tsd": "^0.5.7",
-    "typescript": "^1.7.5",
+    "typescript": "^1.8.10",
     "uglifyjs": "^2.4.10",
     "webpack": "^1.12.13"
   },
@@ -32,6 +31,6 @@
     "node-tests": "mocha tests/spec/*.js",
     "browser-tests": "karma start",
     "test": "npm run node-tests && npm run browser-tests",
-    "uglify": "uglifyjs -o dist/bundle/pubsub-a-micro.min.js dist/bundle/pubsub-a-micro.js"
+    "uglify": "uglifyjs -o dist/bundle/pubsub-a-micro.umd.min.js dist/bundle/pubsub-a-micro.umd.js"
   }
 }

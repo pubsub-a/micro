@@ -7,8 +7,6 @@
         "module": "commonjs"
     },
     "files": [
-        "custom.d.ts",
-
         "src/buckethash.ts",
         "src/internal-interfaces.ts",
         "src/pubsub-anonymous.ts",
