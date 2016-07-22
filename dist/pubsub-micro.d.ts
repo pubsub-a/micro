@@ -1,5 +1,6 @@
 import { IPubSub, IChannel, IPubSubStartCallback, IPubSubStopCallback, IChannelReadyCallback } from 'pubsub-a-interface';
 import { BucketHash } from './buckethash';
+export declare function invokeIfDefined(func: Function, ...args: any[]): void;
 export { BucketHash } from "./buckethash";
 export declare class PubSub implements IPubSub {
     private subscriptionCache;

@@ -1,3 +1,4 @@
+"use strict";
 var buckethash_1 = require('./buckethash');
 var subscription_token_1 = require('./subscription-token');
 var util_1 = require('./util');
@@ -10,6 +11,7 @@ function invokeIfDefined(func) {
         func.apply(func, args);
     }
 }
+exports.invokeIfDefined = invokeIfDefined;
 var buckethash_2 = require("./buckethash");
 exports.BucketHash = buckethash_2.BucketHash;
 var PubSub = (function () {
@@ -39,7 +41,7 @@ var PubSub = (function () {
     PubSub.SubscriptionToken = subscription_token_1.SubscriptionToken;
     PubSub.Util = util_1.default;
     return PubSub;
-})();
+}());
 exports.PubSub = PubSub;
 var AnonymousPubSub = (function () {
     function AnonymousPubSub() {
@@ -55,7 +57,7 @@ var AnonymousPubSub = (function () {
         return this.channel.publish('a', payload);
     };
     return AnonymousPubSub;
-})();
+}());
 function internalIncludeIn(obj, publishName, subscribeName) {
     if (publishName === void 0) { publishName = 'publish'; }
     if (subscribeName === void 0) { subscribeName = 'subscribe'; }
@@ -77,7 +79,7 @@ var Publisher = (function () {
         }
     };
     return Publisher;
-})();
+}());
 var Subscriber = (function () {
     function Subscriber(name, cache) {
         this.name = name;
@@ -94,7 +96,7 @@ var Subscriber = (function () {
         return new subscription_token_1.SubscriptionToken(dispose, number_of_subscriptions);
     };
     return Subscriber;
-})();
+}());
 var Channel = (function () {
     function Channel(name, cache) {
         this.name = name;
@@ -130,5 +132,5 @@ var Channel = (function () {
         return internal_subs;
     };
     return Channel;
-})();
+}());
 //# sourceMappingURL=pubsub-micro.js.map

@@ -1,3 +1,4 @@
+"use strict";
 var Util = (function () {
     function Util() {
     }
@@ -10,7 +11,7 @@ var Util = (function () {
         return text;
     };
     return Util;
-})();
+}());
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.default = Util;
 //# sourceMappingURL=util.js.map

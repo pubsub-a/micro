@@ -1,3 +1,4 @@
+"use strict";
 var provider = [];
 function addProvider(name, ctor) {
     provider[name] = ctor;

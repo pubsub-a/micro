@@ -15,7 +15,7 @@ import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import Util from './util';
 
-function invokeIfDefined(func: Function, ...args: any[]) {
+export function invokeIfDefined(func: Function, ...args: any[]) {
     if (func) {
         func.apply(func, args);
     }

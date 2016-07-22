@@ -1,3 +1,4 @@
+"use strict";
 /**
  * A Hashtable that contains a flat list of entries (bucket) for a given key.
  */
@@ -98,6 +99,6 @@ var BucketHash = (function () {
         return index;
     };
     return BucketHash;
-})();
+}());
 exports.BucketHash = BucketHash;
 //# sourceMappingURL=buckethash.js.map

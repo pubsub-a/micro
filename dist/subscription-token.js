@@ -1,3 +1,4 @@
+"use strict";
 var SubscriptionToken = (function () {
     function SubscriptionToken(disposeFn, count) {
         this.isDisposed = false;
@@ -12,6 +13,6 @@ var SubscriptionToken = (function () {
         return this.disposeFn(callback);
     };
     return SubscriptionToken;
-})();
+}());
 exports.SubscriptionToken = SubscriptionToken;
 //# sourceMappingURL=subscription-token.js.map
