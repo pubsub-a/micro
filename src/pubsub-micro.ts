@@ -10,12 +10,13 @@ IChannelReadyCallback,
 SubscriptionDisposedCallback
 } from 'pubsub-a-interface';
 
+import {Promise} from "es6-promise";
 import { BucketHash, IBucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import Util from './util';
 
-export function invokeIfDefined(func: Function, ...args: any[]) {
+export function invokeIfDefined(func: Function | undefined | null, ...args: any[]) {
     if (func) {
         func.apply(func, args);
     }
@@ -30,19 +31,20 @@ export class PubSub implements IPubSub {
         this.subscriptionCache = new BucketHash<ISubscriptionFunc<any>>();
     }
 
-    start(callback?: IPubSubStartCallback) {
+    start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
         invokeIfDefined(callback, this, undefined, undefined);
+        return Promise.resolve(this);
     }
 
-    stop(callback?: IPubSubStopCallback) {
+    stop(callback?: IPubSubStopCallback): Promise<void> {
         invokeIfDefined(callback);
+        return Promise.resolve(void 0);
     }
 
-    channel(name: string, callback: IChannelReadyCallback): IChannel {
+    channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
         var channel = new Channel(name, this.subscriptionCache);
-        if (callback)
-            callback(channel);
-        return channel;
+        invokeIfDefined(callback, channel);
+        return Promise.resolve(channel);
     }
 
     public static includeIn(obj: any, publish_name?: string, subscribe_name?: string): any {
@@ -75,7 +77,7 @@ class AnonymousPubSub<T> {
 
     constructor() {
         var pubsub = new PubSub();
-        this.channel = pubsub.channel('__i', undefined);
+        pubsub.channel('__i', (chan) => { this.channel = chan });
 
         this.subscribe = this._subscribe.bind(this);
         this.publish = this._publish.bind(this);

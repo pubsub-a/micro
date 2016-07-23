@@ -1,4 +1,5 @@
 "use strict";
+var es6_promise_1 = require("es6-promise");
 var buckethash_1 = require('./buckethash');
 var subscription_token_1 = require('./subscription-token');
 var util_1 = require('./util');
@@ -18,17 +19,18 @@ var PubSub = (function () {
     function PubSub() {
         this.subscriptionCache = new buckethash_1.BucketHash();
     }
-    PubSub.prototype.start = function (callback) {
+    PubSub.prototype.start = function (callback, disconnect) {
         invokeIfDefined(callback, this, undefined, undefined);
+        return es6_promise_1.Promise.resolve(this);
     };
     PubSub.prototype.stop = function (callback) {
         invokeIfDefined(callback);
+        return es6_promise_1.Promise.resolve(void 0);
     };
     PubSub.prototype.channel = function (name, callback) {
         var channel = new Channel(name, this.subscriptionCache);
-        if (callback)
-            callback(channel);
-        return channel;
+        invokeIfDefined(callback, channel);
+        return es6_promise_1.Promise.resolve(channel);
     };
     PubSub.includeIn = function (obj, publish_name, subscribe_name) {
         return internalIncludeIn(obj, publish_name, subscribe_name);
@@ -45,8 +47,9 @@ var PubSub = (function () {
 exports.PubSub = PubSub;
 var AnonymousPubSub = (function () {
     function AnonymousPubSub() {
+        var _this = this;
         var pubsub = new PubSub();
-        this.channel = pubsub.channel('__i', undefined);
+        pubsub.channel('__i', function (chan) { _this.channel = chan; });
         this.subscribe = this._subscribe.bind(this);
         this.publish = this._publish.bind(this);
     }

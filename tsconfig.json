@@ -4,7 +4,8 @@
         "outDir": "dist",
         "declaration": true,
         "sourceMap": true,
-        "module": "commonjs"
+        "module": "commonjs",
+        "strictNullChecks": true
     },
     "files": [
         "src/buckethash.ts",
