@@ -13,22 +13,33 @@
         PubSub = PubSubMicro.PubSub;
     }
 
-    var factory = function(reset) {
-        if (reset === true || reset === undefined)
-            pubsub = new PubSub();
-        return pubsub;
+    var getPubSubImplementation = function() {
+        return new PubSub();
+    };
+
+    var getLinkedPubSubImplementation = function(numInstances) {
+        if (!numInstances) numInstances = 2;
+        var instance = new PubSub();
+
+        var instances = [];
+
+        while(numInstances-- > 0) {
+            // PubSubMicro is object instance based, always return the same object instance
+            instances.push(instance);
+        }
+        return instances;
+    };
+
+    var factory = {
+        name: "PubSubMicro",
+        getPubSubImplementation: getPubSubImplementation,
+        getLinkedPubSubImplementation: getLinkedPubSubImplementation
     };
 
     if (typeof window === "undefined") {
-        module.exports = {
-            factory: factory,
-            name: "PubSubMicro"
-        };
+        module.exports = factory;
     } else {
-        registerPubSubImplementationFactory({
-            factory: factory,
-            name: "PubSubMicro"
-        });
+        registerPubSubImplementationFactory(factory);
     }
 
 }());
