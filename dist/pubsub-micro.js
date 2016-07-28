@@ -15,6 +15,14 @@ function invokeIfDefined(func) {
 exports.invokeIfDefined = invokeIfDefined;
 var buckethash_2 = require("./buckethash");
 exports.BucketHash = buckethash_2.BucketHash;
+function validateChannelOrTopicName(name) {
+    if (typeof name !== 'string')
+        throw new Error("parameter must be of type string");
+    if (!name || name.length > 255)
+        throw new Error("parameter must be between 1 and 255 characters long");
+    // TODO special characters check
+}
+exports.validateChannelOrTopicName = validateChannelOrTopicName;
 var PubSub = (function () {
     function PubSub() {
         this.subscriptionCache = new buckethash_1.BucketHash();
@@ -27,7 +35,16 @@ var PubSub = (function () {
         invokeIfDefined(callback);
         return es6_promise_1.Promise.resolve(void 0);
     };
+    /**
+     * Validates a channel to be between 1 and 255 characters long and consists only of
+     * [A-Za-z0-9] plus the special characters: : _ - /
+     *
+     */
+    PubSub.prototype.validateChannelName = function (name) {
+        return validateChannelOrTopicName(name);
+    };
     PubSub.prototype.channel = function (name, callback) {
+        this.validateChannelName(name);
         var channel = new Channel(name, this.subscriptionCache);
         invokeIfDefined(callback, channel);
         return es6_promise_1.Promise.resolve(channel);

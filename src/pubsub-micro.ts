@@ -1,13 +1,13 @@
 import {
-IPubSub,
-IChannel,
-IPublishReceivedCallback,
-ISubscriptionToken,
-ISubscriptionFunc,
-IPubSubStartCallback,
-IPubSubStopCallback,
-IChannelReadyCallback,
-SubscriptionDisposedCallback
+    IPubSub,
+    IChannel,
+    IPublishReceivedCallback,
+    ISubscriptionToken,
+    ISubscriptionFunc,
+    IPubSubStartCallback,
+    IPubSubStopCallback,
+    IChannelReadyCallback,
+    SubscriptionDisposedCallback
 } from 'pubsub-a-interface';
 
 import {Promise} from "es6-promise";
@@ -22,6 +22,20 @@ export function invokeIfDefined(func: Function | undefined | null, ...args: any[
     }
 }
 export {BucketHash} from "./buckethash";
+
+/**
+ * Validates a channel to be between 1 and 255 characters long and consists only of
+ * [A-Za-z0-9] plus the special characters: : _ - /
+ *
+ */
+export function validateChannelOrTopicName(name: string) {
+    if (typeof name !== 'string')
+        throw new Error("parameter must be of type string");
+    if (!name || name.length > 255)
+        throw new Error("parameter must be between 1 and 255 characters long");
+
+    // TODO special characters check
+}
 
 export class PubSub implements IPubSub {
 
@@ -41,7 +55,12 @@ export class PubSub implements IPubSub {
         return Promise.resolve(void 0);
     }
 
+    private validateChannelName(name: string) {
+        return validateChannelOrTopicName(name);
+    }
+
     channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
+        this.validateChannelName(name);
         var channel = new Channel(name, this.subscriptionCache);
         invokeIfDefined(callback, channel);
         return Promise.resolve(channel);
@@ -77,7 +96,7 @@ class AnonymousPubSub<T> {
 
     constructor() {
         var pubsub = new PubSub();
-        pubsub.channel('__i', (chan) => { this.channel = chan });
+        pubsub.channel('__i', (chan) => { this.channel = chan });
 
         this.subscribe = this._subscribe.bind(this);
         this.publish = this._publish.bind(this);
@@ -133,7 +152,7 @@ class Channel implements IChannel {
     }
 
     private encodeTopic(topic): string {
-        if (topic.indexOf("%") !==  -1) {
+        if (topic.indexOf("%") !== -1) {
             throw "The percent character (%) is not allowed in topic names";
         }
 
