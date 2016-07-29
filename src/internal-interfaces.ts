@@ -1,6 +1,6 @@
 import {
-ISubscriptionFunc,
-ISubscriptionToken,
+    IObserverFunc,
+    ISubscriptionToken,
 } from 'pubsub-a-interface';
 import { SubscriptionToken } from './subscription-token';
 
@@ -9,5 +9,5 @@ export interface IPublisher<T> {
 }
 
 export interface ISubscriber<T> {
-    subscribe(fn: ISubscriptionFunc<T>, callback?: Function): ISubscriptionToken;
+    subscribe(observer: IObserverFunc<T>, callback?: Function): ISubscriptionToken;
 }
