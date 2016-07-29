@@ -16,10 +16,14 @@ export class BucketHash<T> implements IBucketHash<T> {
      * To prevent collisions with reserved JavaScript propertie of Object, we prefix every key
      * with a special character.
      */
-    private encodeKey(key: string) {
+    private encodeKey(key: string): string {
         // prevent using JS internal properties of Object by using a prefix
         // for all keys
-        return '$' + key;
+        return '%' + key;
+    }
+
+    private decodeKey(key: string): string {
+        return key.substr(1);
     }
 
     /**
@@ -50,6 +54,17 @@ export class BucketHash<T> implements IBucketHash<T> {
     get(key: string): Array<T> {
         var encodedKey = this.encodeKey(key);
         return this.dict[encodedKey] || [];
+    }
+
+    keys(): Array<string> {
+        const result = [];
+        for (let key of Object.keys(this.dict)) {
+            if (key[0] === '%') {
+                let decodedKey = this.decodeKey(key);
+                (result as any).push(decodedKey as any);
+            }
+        };
+        return result;
     }
 
     /**
