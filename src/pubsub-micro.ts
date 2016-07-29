@@ -10,11 +10,12 @@ import {
     SubscriptionDisposedCallback
 } from 'pubsub-a-interface';
 
-import {Promise} from "es6-promise";
+import { Promise } from "es6-promise";
 import { BucketHash, IBucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import Util from './util';
+import { validateChannelName, validateTopicName } from "./string_validation";
 
 export function invokeIfDefined(func: Function | undefined | null, ...args: any[]) {
     if (func) {
@@ -22,20 +23,8 @@ export function invokeIfDefined(func: Function | undefined | null, ...args: any[
     }
 }
 export {BucketHash} from "./buckethash";
+export {validateChannelName, validateTopicName} from "./string_validation";
 
-/**
- * Validates a channel to be between 1 and 255 characters long and consists only of
- * [A-Za-z0-9] plus the special characters: : _ - /
- *
- */
-export function validateChannelOrTopicName(name: string) {
-    if (typeof name !== 'string')
-        throw new Error("parameter must be of type string");
-    if (!name || name.length > 255)
-        throw new Error("parameter must be between 1 and 255 characters long");
-
-    // TODO special characters check
-}
 
 export class PubSub implements IPubSub {
 
@@ -55,12 +44,8 @@ export class PubSub implements IPubSub {
         return Promise.resolve(void 0);
     }
 
-    private validateChannelName(name: string) {
-        return validateChannelOrTopicName(name);
-    }
-
     channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
-        this.validateChannelName(name);
+        validateChannelName(name);
         var channel = new Channel(name, this.subscriptionCache);
         invokeIfDefined(callback, channel);
         return Promise.resolve(channel);
@@ -164,7 +149,7 @@ class Channel implements IChannel {
     }
 
     publish<T>(topic: string, payload: T, callback?: Function) {
-        validateChannelOrTopicName(topic);
+        validateTopicName(topic);
         var publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
@@ -173,7 +158,7 @@ class Channel implements IChannel {
     subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: Function)
         : ISubscriptionToken {
 
-        validateChannelOrTopicName(topic);
+        validateTopicName(topic);
         var subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
         var subscription = subscriber.subscribe(observer);
 
@@ -185,7 +170,7 @@ class Channel implements IChannel {
     once<T>(topic: string, observer: IObserverFunc<T>, callback?: Function)
         : ISubscriptionToken {
 
-        validateChannelOrTopicName(topic);
+        validateTopicName(topic);
         let subscription;
         let subscribeAndDispose = ((payload: T) => {
             subscription.dispose();

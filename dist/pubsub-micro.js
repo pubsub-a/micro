@@ -3,6 +3,7 @@ var es6_promise_1 = require("es6-promise");
 var buckethash_1 = require('./buckethash');
 var subscription_token_1 = require('./subscription-token');
 var util_1 = require('./util');
+var string_validation_1 = require("./string_validation");
 function invokeIfDefined(func) {
     var args = [];
     for (var _i = 1; _i < arguments.length; _i++) {
@@ -15,19 +16,9 @@ function invokeIfDefined(func) {
 exports.invokeIfDefined = invokeIfDefined;
 var buckethash_2 = require("./buckethash");
 exports.BucketHash = buckethash_2.BucketHash;
-/**
- * Validates a channel to be between 1 and 255 characters long and consists only of
- * [A-Za-z0-9] plus the special characters: : _ - /
- *
- */
-function validateChannelOrTopicName(name) {
-    if (typeof name !== 'string')
-        throw new Error("parameter must be of type string");
-    if (!name || name.length > 255)
-        throw new Error("parameter must be between 1 and 255 characters long");
-    // TODO special characters check
-}
-exports.validateChannelOrTopicName = validateChannelOrTopicName;
+var string_validation_2 = require("./string_validation");
+exports.validateChannelName = string_validation_2.validateChannelName;
+exports.validateTopicName = string_validation_2.validateTopicName;
 var PubSub = (function () {
     function PubSub() {
         this.subscriptionCache = new buckethash_1.BucketHash();
@@ -40,11 +31,8 @@ var PubSub = (function () {
         invokeIfDefined(callback);
         return es6_promise_1.Promise.resolve(void 0);
     };
-    PubSub.prototype.validateChannelName = function (name) {
-        return validateChannelOrTopicName(name);
-    };
     PubSub.prototype.channel = function (name, callback) {
-        this.validateChannelName(name);
+        string_validation_1.validateChannelName(name);
         var channel = new Channel(name, this.subscriptionCache);
         invokeIfDefined(callback, channel);
         return es6_promise_1.Promise.resolve(channel);
@@ -88,12 +76,12 @@ function internalIncludeIn(obj, publishName, subscribeName) {
     return obj;
 }
 var Publisher = (function () {
-    function Publisher(name, cache) {
-        this.name = name;
+    function Publisher(encodedTopic, cache) {
+        this.encodedTopic = encodedTopic;
         this.cache = cache;
     }
     Publisher.prototype.publish = function (obj) {
-        var subs = this.cache.get(this.name);
+        var subs = this.cache.get(this.encodedTopic);
         for (var i = 0; i < subs.length; i++) {
             subs[i](obj);
         }
@@ -101,15 +89,15 @@ var Publisher = (function () {
     return Publisher;
 }());
 var Subscriber = (function () {
-    function Subscriber(name, cache) {
-        this.name = name;
-        this.cache = cache;
+    function Subscriber(encodedTopic, bucket) {
+        this.encodedTopic = encodedTopic;
+        this.bucket = bucket;
     }
-    Subscriber.prototype.subscribe = function (cb) {
+    Subscriber.prototype.subscribe = function (observer) {
         var _this = this;
-        var number_of_subscriptions = this.cache.add(this.name, cb);
+        var number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
         var dispose = function (callback) {
-            var remaining = _this.cache.remove(_this.name, cb);
+            var remaining = _this.bucket.remove(_this.encodedTopic, observer);
             invokeIfDefined(callback, remaining);
             return remaining;
         };
@@ -118,38 +106,44 @@ var Subscriber = (function () {
     return Subscriber;
 }());
 var Channel = (function () {
-    function Channel(name, cache) {
+    function Channel(name, bucket) {
         this.name = name;
-        this.cache = cache;
+        this.bucket = bucket;
         this.name = name;
     }
+    /**
+     * We encode the channel namen and the topic into a single string to place in the BucketHash.
+     * This way all channel/topic combinations will share subscriptions, independent of the current
+     * instance of the Channel object.
+     *
+     * For example, two different Channel object instances will trigger each others subscriptions this way.
+     */
     Channel.prototype.encodeTopic = function (topic) {
-        if (topic.indexOf("%") !== -1) {
-            throw "The percent character (%) is not allowed in topic names";
-        }
-        var encodedTopic = this.name + "%" + topic;
+        var encodedTopic = this.name + "_%_" + topic;
         return encodedTopic;
     };
     Channel.prototype.publish = function (topic, payload, callback) {
-        var publisher = new Publisher(this.encodeTopic(topic), this.cache);
+        string_validation_1.validateTopicName(topic);
+        var publisher = new Publisher(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
     };
-    Channel.prototype.subscribe = function (topic, subscription, callback) {
-        var subscriber = new Subscriber(this.encodeTopic(topic), this.cache);
-        var subscriptionHandle = subscriber.subscribe(subscription);
-        invokeIfDefined(callback, subscriptionHandle, topic, subscription);
-        return subscriptionHandle;
+    Channel.prototype.subscribe = function (topic, observer, callback) {
+        string_validation_1.validateTopicName(topic);
+        var subscriber = new Subscriber(this.encodeTopic(topic), this.bucket);
+        var subscription = subscriber.subscribe(observer);
+        invokeIfDefined(callback, subscription, topic, observer);
+        return subscription;
     };
-    Channel.prototype.once = function (topic, subscription, callback) {
-        var internal_subs;
-        var wrapperInnerFunc = function (payload) {
-            internal_subs.dispose();
-            subscription(payload);
-        };
-        var wrapperFunc = wrapperInnerFunc.bind(subscription);
-        internal_subs = this.subscribe(this.encodeTopic(topic), wrapperFunc, callback);
-        return internal_subs;
+    Channel.prototype.once = function (topic, observer, callback) {
+        string_validation_1.validateTopicName(topic);
+        var subscription;
+        var subscribeAndDispose = (function (payload) {
+            subscription.dispose();
+            observer(payload);
+        }).bind(observer);
+        subscription = this.subscribe(this.encodeTopic(topic), subscribeAndDispose, callback);
+        return subscription;
     };
     return Channel;
 }());
