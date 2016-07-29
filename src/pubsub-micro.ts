@@ -15,7 +15,7 @@ import { BucketHash, IBucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import Util from './util';
-import { validateChannelName, validateTopicName } from "./string_validation";
+import { StringValidator, StringValidationSettings } from "./string_validation";
 
 export function invokeIfDefined(func: Function | undefined | null, ...args: any[]) {
     if (func) {
@@ -23,15 +23,20 @@ export function invokeIfDefined(func: Function | undefined | null, ...args: any[
     }
 }
 export {BucketHash} from "./buckethash";
-export {validateChannelName, validateTopicName} from "./string_validation";
-
+export {StringValidator, StringValidationSettings} from "./string_validation";
 
 export class PubSub implements IPubSub {
 
-    private subscriptionCache;
+    private subscriptionCache: BucketHash<IObserverFunc<any>>;
+    private stringValidator: StringValidator;
 
     constructor() {
         this.subscriptionCache = new BucketHash<IObserverFunc<any>>();
+        this.stringValidator = new StringValidator();
+    }
+
+    public setStringValidationLimits(settings: StringValidationSettings) {
+        this.stringValidator = new StringValidator(settings);
     }
 
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
@@ -45,8 +50,8 @@ export class PubSub implements IPubSub {
     }
 
     channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
-        validateChannelName(name);
-        var channel = new Channel(name, this.subscriptionCache);
+        this.stringValidator.validateChannelName(name);
+        var channel = new Channel(name, this.subscriptionCache, this.stringValidator);
         invokeIfDefined(callback, channel);
         return Promise.resolve(channel);
     }
@@ -132,8 +137,12 @@ class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
 }
 
 class Channel implements IChannel {
-    constructor(public name: string, private bucket: IBucketHash<IObserverFunc<any>>) {
+
+    private stringValidator: StringValidator;
+
+    constructor(public name: string, private bucket: IBucketHash<IObserverFunc<any>>, stringValidator: StringValidator) {
         this.name = name;
+        this.stringValidator = stringValidator;
     }
 
     /**
@@ -149,7 +158,7 @@ class Channel implements IChannel {
     }
 
     publish<T>(topic: string, payload: T, callback?: Function) {
-        validateTopicName(topic);
+        this.stringValidator.validateTopicName(topic);
         var publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
@@ -158,7 +167,7 @@ class Channel implements IChannel {
     subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: Function)
         : ISubscriptionToken {
 
-        validateTopicName(topic);
+        this.stringValidator.validateTopicName(topic);
         var subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
         var subscription = subscriber.subscribe(observer);
 
@@ -170,7 +179,8 @@ class Channel implements IChannel {
     once<T>(topic: string, observer: IObserverFunc<T>, callback?: Function)
         : ISubscriptionToken {
 
-        validateTopicName(topic);
+        this.stringValidator.validateTopicName(topic);
+
         let subscription;
         let subscribeAndDispose = ((payload: T) => {
             subscription.dispose();
