@@ -3,7 +3,7 @@ import {
     IChannel,
     IPublishReceivedCallback,
     ISubscriptionToken,
-    ISubscriptionFunc,
+    IObserverFunc,
     IPubSubStartCallback,
     IPubSubStopCallback,
     IChannelReadyCallback,
@@ -42,7 +42,7 @@ export class PubSub implements IPubSub {
     private subscriptionCache;
 
     constructor() {
-        this.subscriptionCache = new BucketHash<ISubscriptionFunc<any>>();
+        this.subscriptionCache = new BucketHash<IObserverFunc<any>>();
     }
 
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
@@ -83,7 +83,7 @@ export class PubSub implements IPubSub {
 class AnonymousPubSub<T> {
     private channel: IChannel;
 
-    private _subscribe(fn: ISubscriptionFunc<T>) {
+    private _subscribe(fn: IObserverFunc<T>) {
         return this.channel.subscribe('a', fn);
     }
 
@@ -91,7 +91,7 @@ class AnonymousPubSub<T> {
         return this.channel.publish('a', payload);
     }
 
-    public subscribe: (fn: ISubscriptionFunc<T>) => ISubscriptionToken;
+    public subscribe: (fn: IObserverFunc<T>) => ISubscriptionToken;
     public publish: (payload: T) => void;
 
     constructor() {
@@ -117,11 +117,11 @@ function internalIncludeIn(
 
 class Publisher<T> implements InternalInterfaces.IPublisher<T> {
 
-    constructor(public name: string, private cache: IBucketHash<ISubscriptionFunc<any>>) {
+    constructor(public encodedTopic: string, private cache: IBucketHash<IObserverFunc<any>>) {
     }
 
     publish(obj: T): void {
-        var subs = this.cache.get(this.name);
+        var subs = this.cache.get(this.encodedTopic);
         for (var i = 0; i < subs.length; i++) {
             subs[i](obj);
         }
@@ -130,14 +130,14 @@ class Publisher<T> implements InternalInterfaces.IPublisher<T> {
 
 class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
 
-    constructor(public name: string, private cache: IBucketHash<ISubscriptionFunc<T>>) {
+    constructor(public encodedTopic: string, private bucket: IBucketHash<IObserverFunc<T>>) {
     }
 
-    subscribe(cb: ISubscriptionFunc<T>): ISubscriptionToken {
-        var number_of_subscriptions = this.cache.add(this.name, cb);
+    subscribe(observer: IObserverFunc<T>): ISubscriptionToken {
+        var number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
 
         var dispose = (callback?: SubscriptionDisposedCallback) => {
-            var remaining = this.cache.remove(this.name, cb);
+            var remaining = this.bucket.remove(this.encodedTopic, observer);
             invokeIfDefined(callback, remaining);
             return remaining;
         };
@@ -147,45 +147,52 @@ class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
 }
 
 class Channel implements IChannel {
-    constructor(public name: string, private cache: IBucketHash<ISubscriptionFunc<any>>) {
+    constructor(public name: string, private bucket: IBucketHash<IObserverFunc<any>>) {
         this.name = name;
     }
 
+    /**
+     * We encode the channel namen and the topic into a single string to place in the BucketHash.
+     * This way all channel/topic combinations will share subscriptions, independent of the current
+     * instance of the Channel object.
+     *
+     * For example, two different Channel object instances will trigger each others subscriptions this way.
+     */
     private encodeTopic(topic): string {
-        if (topic.indexOf("%") !== -1) {
-            throw "The percent character (%) is not allowed in topic names";
-        }
-
-        const encodedTopic = `${this.name}%${topic}`;
+        const encodedTopic = `${this.name}_%_${topic}`;
         return encodedTopic;
     }
 
     publish<T>(topic: string, payload: T, callback?: Function) {
-        var publisher = new Publisher<T>(this.encodeTopic(topic), this.cache);
+        validateChannelOrTopicName(topic);
+        var publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
     }
 
-    subscribe<T>(topic: string, subscription: ISubscriptionFunc<T>, callback?: Function)
+    subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: Function)
         : ISubscriptionToken {
 
-        var subscriber = new Subscriber<T>(this.encodeTopic(topic), this.cache);
-        var subscriptionHandle = subscriber.subscribe(subscription);
+        validateChannelOrTopicName(topic);
+        var subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
+        var subscription = subscriber.subscribe(observer);
 
-        invokeIfDefined(callback, subscriptionHandle, topic, subscription);
-        return subscriptionHandle;
+        invokeIfDefined(callback, subscription, topic, observer);
+        return subscription;
     }
 
-    once<T>(topic: string, subscription: ISubscriptionFunc<T>, callback?: Function)
+
+    once<T>(topic: string, observer: IObserverFunc<T>, callback?: Function)
         : ISubscriptionToken {
-        var internal_subs;
-        var wrapperInnerFunc = (payload: T) => {
-            internal_subs.dispose();
-            subscription(payload);
-        };
-        var wrapperFunc = wrapperInnerFunc.bind(subscription);
-        internal_subs = this.subscribe<T>(this.encodeTopic(topic), wrapperFunc, callback);
-        return internal_subs;
+
+        validateChannelOrTopicName(topic);
+        let subscription;
+        let subscribeAndDispose = ((payload: T) => {
+            subscription.dispose();
+            observer(payload);
+        }).bind(observer);
+        subscription = this.subscribe<T>(this.encodeTopic(topic), subscribeAndDispose, callback);
+        return subscription;
     }
 
 }
