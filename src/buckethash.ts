@@ -56,6 +56,10 @@ export class BucketHash<T> implements IBucketHash<T> {
         return this.dict[encodedKey] || [];
     }
 
+    /**
+     * Gets all keys in the bucket.
+     * @return {Array<string>}
+     */
     keys(): Array<string> {
         const result = [];
         for (let key of Object.keys(this.dict)) {
@@ -70,8 +74,8 @@ export class BucketHash<T> implements IBucketHash<T> {
     /**
      * Checks if there exists a bucket at the given key - that it that at least one element exists
      * in the bucket.
-     * @param  {string}  key [description]
-     * @return {boolean}     [description]
+     * @param  {string}  key
+     * @return {boolean} State of existance of the key
      */
     exists(key: string): boolean {
         var encodedKey = this.encodeKey(key);
@@ -80,7 +84,7 @@ export class BucketHash<T> implements IBucketHash<T> {
 
     /**
      * Clears the bucket (and thus removes all elements within it) from the Hashtable.
-     * @param {string} key [description]
+     * @param {string} key
      */
     clear(key: string): void {
         this.remove(key);
@@ -94,9 +98,8 @@ export class BucketHash<T> implements IBucketHash<T> {
      * @return {number}      The number of items in the bucket AFTER the element has been removed.
      */
     remove(key: string, item?: T): number {
-        var encodedKey = this.encodeKey(key);
-        var bucket: Array<T> = this.dict[encodedKey];
-        var index;
+        const encodedKey = this.encodeKey(key);
+        const bucket: Array<T> = this.dict[encodedKey];
 
         if (!bucket) {
             throw new Error("Key does not exist");
@@ -107,8 +110,8 @@ export class BucketHash<T> implements IBucketHash<T> {
             return 0;
         }
 
-        // iterate over the available subscriptions
-        index = this.removeFromArray(bucket, item)
+        // iterate over the available elements
+        let index = this.removeFromArray(bucket, item)
 
         if (index === -1)
             throw new Error("Trying to remove non-existant element from the bucket");
