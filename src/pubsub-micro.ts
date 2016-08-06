@@ -7,7 +7,8 @@ import {
     IPubSubStartCallback,
     IPubSubStopCallback,
     IChannelReadyCallback,
-    SubscriptionDisposedCallback
+    SubscriptionDisposedCallback,
+    ISubscriptionRegisteredCallback
 } from 'pubsub-a-interface';
 
 import { Promise } from "es6-promise";
@@ -164,30 +165,32 @@ class Channel implements IChannel {
         invokeIfDefined(callback, topic, payload);
     }
 
-    subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: Function)
-        : ISubscriptionToken {
+    subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>)
+        : Promise<ISubscriptionToken> {
+
+        if (!observer) {
+            throw new Error("observer function must be given and be of type function");
+        }
 
         this.stringValidator.validateTopicName(topic);
-        var subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
-        var subscription = subscriber.subscribe(observer);
+        const subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
+        const subscription = subscriber.subscribe(observer);
 
         invokeIfDefined(callback, subscription, topic, observer);
-        return subscription;
+        return Promise.resolve(subscription);
     }
 
 
-    once<T>(topic: string, observer: IObserverFunc<T>, callback?: Function)
-        : ISubscriptionToken {
-
-        this.stringValidator.validateTopicName(topic);
+    once<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>)
+        : Promise<ISubscriptionToken> {
 
         let subscription;
         let subscribeAndDispose = ((payload: T) => {
             subscription.dispose();
             observer(payload);
         }).bind(observer);
-        subscription = this.subscribe<T>(this.encodeTopic(topic), subscribeAndDispose, callback);
-        return subscription;
+        subscription = this.subscribe<T>(topic, subscribeAndDispose, callback);
+        return Promise.resolve(subscription);
     }
 
 }

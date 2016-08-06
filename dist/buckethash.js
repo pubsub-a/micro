@@ -13,7 +13,10 @@ var BucketHash = (function () {
     BucketHash.prototype.encodeKey = function (key) {
         // prevent using JS internal properties of Object by using a prefix
         // for all keys
-        return '$' + key;
+        return '%' + key;
+    };
+    BucketHash.prototype.decodeKey = function (key) {
+        return key.substr(1);
     };
     /**
      * Adds an element to the bucket addressed by key.
@@ -44,10 +47,26 @@ var BucketHash = (function () {
         return this.dict[encodedKey] || [];
     };
     /**
+     * Gets all keys in the bucket.
+     * @return {Array<string>}
+     */
+    BucketHash.prototype.keys = function () {
+        var result = [];
+        for (var _i = 0, _a = Object.keys(this.dict); _i < _a.length; _i++) {
+            var key = _a[_i];
+            if (key[0] === '%') {
+                var decodedKey = this.decodeKey(key);
+                result.push(decodedKey);
+            }
+        }
+        ;
+        return result;
+    };
+    /**
      * Checks if there exists a bucket at the given key - that it that at least one element exists
      * in the bucket.
-     * @param  {string}  key [description]
-     * @return {boolean}     [description]
+     * @param  {string}  key
+     * @return {boolean} State of existance of the key
      */
     BucketHash.prototype.exists = function (key) {
         var encodedKey = this.encodeKey(key);
@@ -55,7 +74,7 @@ var BucketHash = (function () {
     };
     /**
      * Clears the bucket (and thus removes all elements within it) from the Hashtable.
-     * @param {string} key [description]
+     * @param {string} key
      */
     BucketHash.prototype.clear = function (key) {
         this.remove(key);
@@ -70,7 +89,6 @@ var BucketHash = (function () {
     BucketHash.prototype.remove = function (key, item) {
         var encodedKey = this.encodeKey(key);
         var bucket = this.dict[encodedKey];
-        var index;
         if (!bucket) {
             throw new Error("Key does not exist");
         }
@@ -78,8 +96,8 @@ var BucketHash = (function () {
             delete this.dict[encodedKey];
             return 0;
         }
-        // iterate over the available subscriptions
-        index = this.removeFromArray(bucket, item);
+        // iterate over the available elements
+        var index = this.removeFromArray(bucket, item);
         if (index === -1)
             throw new Error("Trying to remove non-existant element from the bucket");
         // to save memory we remove the key completely when the bucket becomes empty

@@ -17,12 +17,15 @@ exports.invokeIfDefined = invokeIfDefined;
 var buckethash_2 = require("./buckethash");
 exports.BucketHash = buckethash_2.BucketHash;
 var string_validation_2 = require("./string_validation");
-exports.validateChannelName = string_validation_2.validateChannelName;
-exports.validateTopicName = string_validation_2.validateTopicName;
+exports.StringValidator = string_validation_2.StringValidator;
 var PubSub = (function () {
     function PubSub() {
         this.subscriptionCache = new buckethash_1.BucketHash();
+        this.stringValidator = new string_validation_1.StringValidator();
     }
+    PubSub.prototype.setStringValidationLimits = function (settings) {
+        this.stringValidator = new string_validation_1.StringValidator(settings);
+    };
     PubSub.prototype.start = function (callback, disconnect) {
         invokeIfDefined(callback, this, undefined, undefined);
         return es6_promise_1.Promise.resolve(this);
@@ -32,8 +35,8 @@ var PubSub = (function () {
         return es6_promise_1.Promise.resolve(void 0);
     };
     PubSub.prototype.channel = function (name, callback) {
-        string_validation_1.validateChannelName(name);
-        var channel = new Channel(name, this.subscriptionCache);
+        this.stringValidator.validateChannelName(name);
+        var channel = new Channel(name, this.subscriptionCache, this.stringValidator);
         invokeIfDefined(callback, channel);
         return es6_promise_1.Promise.resolve(channel);
     };
@@ -106,10 +109,11 @@ var Subscriber = (function () {
     return Subscriber;
 }());
 var Channel = (function () {
-    function Channel(name, bucket) {
+    function Channel(name, bucket, stringValidator) {
         this.name = name;
         this.bucket = bucket;
         this.name = name;
+        this.stringValidator = stringValidator;
     }
     /**
      * We encode the channel namen and the topic into a single string to place in the BucketHash.
@@ -123,27 +127,29 @@ var Channel = (function () {
         return encodedTopic;
     };
     Channel.prototype.publish = function (topic, payload, callback) {
-        string_validation_1.validateTopicName(topic);
+        this.stringValidator.validateTopicName(topic);
         var publisher = new Publisher(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
     };
     Channel.prototype.subscribe = function (topic, observer, callback) {
-        string_validation_1.validateTopicName(topic);
+        if (!observer) {
+            throw new Error("observer function must be given and be of type function");
+        }
+        this.stringValidator.validateTopicName(topic);
         var subscriber = new Subscriber(this.encodeTopic(topic), this.bucket);
         var subscription = subscriber.subscribe(observer);
         invokeIfDefined(callback, subscription, topic, observer);
-        return subscription;
+        return es6_promise_1.Promise.resolve(subscription);
     };
     Channel.prototype.once = function (topic, observer, callback) {
-        string_validation_1.validateTopicName(topic);
         var subscription;
         var subscribeAndDispose = (function (payload) {
             subscription.dispose();
             observer(payload);
         }).bind(observer);
-        subscription = this.subscribe(this.encodeTopic(topic), subscribeAndDispose, callback);
-        return subscription;
+        subscription = this.subscribe(topic, subscribeAndDispose, callback);
+        return es6_promise_1.Promise.resolve(subscription);
     };
     return Channel;
 }());

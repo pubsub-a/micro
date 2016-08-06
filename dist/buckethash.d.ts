@@ -14,6 +14,7 @@ export declare class BucketHash<T> implements IBucketHash<T> {
      * with a special character.
      */
     private encodeKey(key);
+    private decodeKey(key);
     /**
      * Adds an element to the bucket addressed by key.
      * @param  {string}      key
@@ -29,15 +30,20 @@ export declare class BucketHash<T> implements IBucketHash<T> {
      */
     get(key: string): Array<T>;
     /**
+     * Gets all keys in the bucket.
+     * @return {Array<string>}
+     */
+    keys(): Array<string>;
+    /**
      * Checks if there exists a bucket at the given key - that it that at least one element exists
      * in the bucket.
-     * @param  {string}  key [description]
-     * @return {boolean}     [description]
+     * @param  {string}  key
+     * @return {boolean} State of existance of the key
      */
     exists(key: string): boolean;
     /**
      * Clears the bucket (and thus removes all elements within it) from the Hashtable.
-     * @param {string} key [description]
+     * @param {string} key
      */
     clear(key: string): void;
     /**
