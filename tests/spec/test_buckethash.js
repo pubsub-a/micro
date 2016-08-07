@@ -85,4 +85,48 @@ describe('BucketHash basic tests', function() {
     expect(str).to.equal('{}');
   });
 
+  it ("should be able to get all keys", function() {
+    var hash = new BucketHash();
+    var item = {};
+    hash.add("key1", item);
+    hash.add("key2", item);
+    hash.add("key3", item);
+
+    var keys = hash.keys();
+    expect(keys).to.include("key1");
+    expect(keys).to.include("key2");
+    expect(keys).to.include("key3");
+
+    expect(keys.length).to.equal(3);
+  });
+
+  if ("should be able to get all keys and do not include empty buckets", function() {
+    var hash = new BucketHash();
+    var item = {};
+    hash.add("key1", item);
+    hash.add("key2", item);
+    hash.add("key3", item);
+    hash.remove("key1", item);
+
+    expect(keys).to.include("key2");
+    expect(keys).to.include("key3");
+
+    expect(keys.length).to.equal(2);
+  });
+
+  if ("should be able to get all keys and do not include cleared buckets", function() {
+    var hash = new BucketHash();
+    var item = {};
+    hash.add("key1", item);
+    hash.add("key1", item);
+    hash.add("key2", item);
+    hash.add("key3", item);
+    hash.clear("key1");
+
+    expect(keys).to.include("key2");
+    expect(keys).to.include("key3");
+
+    expect(keys.length).to.equal(2);
+  });
+
 });
