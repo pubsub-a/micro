@@ -34,10 +34,20 @@ describe('BucketHash basic tests', function() {
     expect(count).to.equal(1);
   });
 
-  it ("should throw an exception if the key does not exist", function() {
+  it ("should not throw an exception if we try to clear an empty bucket", function() {
     var hash = new BucketHash();
     var fn = function() {
-      hash.remove('key');
+      hash.clear('key');
+    };
+
+    expect(fn).not.to.throw();
+  });
+
+  it ("should throw an exception if the key does not exist but an item to remove is specified", function() {
+    var hash = new BucketHash();
+    var item = {};
+    var fn = function() {
+      hash.remove('key', item);
     };
 
     expect(fn).to.throw();
@@ -46,10 +56,11 @@ describe('BucketHash basic tests', function() {
   it ("throw an exception if the element is not in the bucket", function() {
     var hash = new BucketHash();
     var item = {};
+    var nonexistingitem = 1;
     hash.add('key', item);
     hash.add('key', item);
 
-    expect(function() { hash.remove('key', 1); }).to.throw();
+    expect(function() { hash.remove('key', nonexistingitem); }).to.throw();
   });
 
   it ("should not have any elements for a key if it is removed", function() {
