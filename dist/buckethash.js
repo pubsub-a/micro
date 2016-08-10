@@ -90,7 +90,15 @@ var BucketHash = (function () {
         var encodedKey = this.encodeKey(key);
         var bucket = this.dict[encodedKey];
         if (!bucket) {
-            throw new Error("Key does not exist");
+            if (!item) {
+                // if no item is given and there is no bucket, nothing to clear
+                return 0;
+            }
+            else {
+                // if an item is given but there is no bucket, we ran into an error - the item was
+                // removed earlier of the bucket was cleared earlier
+                throw new Error("Key '" + key + "' does not exist");
+            }
         }
         if (!item) {
             delete this.dict[encodedKey];
