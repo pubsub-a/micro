@@ -1,6 +1,7 @@
 export interface StringValidationSettings {
     channelNameMaxLength: number;
     topicNameMaxLength: number;
+    allowAllCharacters: boolean;
 }
 
 export class StringValidator {
@@ -10,7 +11,8 @@ export class StringValidator {
         if (!settings) {
             settings = {
                 channelNameMaxLength: 63,
-                topicNameMaxLength: 255
+                topicNameMaxLength: 255,
+                allowAllCharacters: false
             };
         }
         this.settings = settings;
@@ -53,6 +55,9 @@ export class StringValidator {
         if (!name || name.length > this.settings.topicNameMaxLength)
             throw new Error(`Topic name must be between 1 and ${this.settings.topicNameMaxLength} characters long`);
 
+        if (this.settings.allowAllCharacters)
+            return;
+
         // quick return if there is no special characters
         if (this.containsOnlyValidChars(name))
             return;
@@ -62,7 +67,7 @@ export class StringValidator {
             repl = repl.replace(/_\$_/g, '');
             repl = repl.replace(/_%_/g, '');
             if (!this.containsOnlyValidChars(repl)) {
-                throw new Error("Topic name contains unallowed character(s)");
+                throw new Error(`Topic name contains unallowed character(s): ${name}`);
             }
         }
     }
