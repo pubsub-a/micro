@@ -16,7 +16,6 @@ import { BucketHash, IBucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import Util from './util';
-import { StringValidator, StringValidationSettings } from "./string_validation";
 
 export function invokeIfDefined(func: Function | undefined | null, ...args: any[]) {
     if (func) {
@@ -24,20 +23,17 @@ export function invokeIfDefined(func: Function | undefined | null, ...args: any[
     }
 }
 export {BucketHash} from "./buckethash";
+export {PubSubMicroValidated as PubSub} from "./pubsub-stringvalidated";
 export {StringValidator, StringValidationSettings} from "./string_validation";
 
-export class PubSub implements IPubSub {
+export {PubSub as PubSubRaw};
+
+class PubSub implements IPubSub {
 
     private subscriptionCache: BucketHash<IObserverFunc<any>>;
-    private stringValidator: StringValidator;
 
     constructor() {
         this.subscriptionCache = new BucketHash<IObserverFunc<any>>();
-        this.stringValidator = new StringValidator();
-    }
-
-    public setStringValidationLimits(settings: StringValidationSettings) {
-        this.stringValidator = new StringValidator(settings);
     }
 
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
@@ -51,8 +47,7 @@ export class PubSub implements IPubSub {
     }
 
     channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
-        this.stringValidator.validateChannelName(name);
-        var channel = new Channel(name, this.subscriptionCache, this.stringValidator);
+        var channel = new Channel(name, this.subscriptionCache);
         invokeIfDefined(callback, channel);
         return Promise.resolve(channel);
     }
@@ -139,11 +134,8 @@ class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
 
 class Channel implements IChannel {
 
-    private stringValidator: StringValidator;
-
-    constructor(public name: string, private bucket: IBucketHash<IObserverFunc<any>>, stringValidator: StringValidator) {
+    constructor(public name: string, private bucket: IBucketHash<IObserverFunc<any>>) {
         this.name = name;
-        this.stringValidator = stringValidator;
     }
 
     /**
@@ -159,7 +151,6 @@ class Channel implements IChannel {
     }
 
     publish<T>(topic: string, payload: T, callback?: Function) {
-        this.stringValidator.validateTopicName(topic);
         var publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
@@ -172,7 +163,6 @@ class Channel implements IChannel {
             throw new Error("observer function must be given and be of type function");
         }
 
-        this.stringValidator.validateTopicName(topic);
         const subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
         const subscription = subscriber.subscribe(observer);
 
