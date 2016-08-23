@@ -16,19 +16,15 @@ import { BucketHash, IBucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import Util from './util';
+import {PubSubMicroValidated} from "./pubsub-stringvalidated";
 
 export function invokeIfDefined(func: Function | undefined | null, ...args: any[]) {
     if (func) {
         func.apply(func, args);
     }
 }
-export {BucketHash} from "./buckethash";
-export {PubSubMicroValidated as PubSub} from "./pubsub-stringvalidated";
-export {StringValidator, StringValidationSettings} from "./string_validation";
 
-export {PubSub as PubSubRaw};
-
-class PubSub implements IPubSub {
+export class PubSubMicro implements IPubSub {
 
     private subscriptionCache: BucketHash<IObserverFunc<any>>;
 
@@ -81,7 +77,7 @@ class AnonymousPubSub<T> {
     public publish: (payload: T) => void;
 
     constructor() {
-        var pubsub = new PubSub();
+        var pubsub = new PubSubMicroValidated();
         pubsub.channel('__i', (chan) => { this.channel = chan });
 
         this.subscribe = this._subscribe.bind(this);

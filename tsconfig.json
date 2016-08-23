@@ -15,6 +15,7 @@
         "src/pubsub-micro.ts",
         "src/pubsub-stringvalidated.ts",
         "src/subscription-token.ts",
-        "src/util.ts"
+        "src/util.ts",
+        "src/pubsub.ts"
     ]
 }

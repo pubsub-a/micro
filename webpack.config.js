@@ -1,7 +1,7 @@
 var path = require('path');
 module.exports = {
     target: 'web',
-    entry: 'pubsub-micro.js',
+    entry: 'pubsub.js',
     resolve: {
         root: path.resolve('./dist/'),
         extensions: ['', '.json', '.js']

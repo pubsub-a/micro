@@ -12,7 +12,7 @@ import {
 } from 'pubsub-a-interface';
 
 import { Promise } from "es6-promise";
-import { PubSubRaw } from "./pubsub-micro";
+import { PubSubMicro } from "./pubsub-micro";
 import { StringValidator, StringValidationSettings } from "./string_validation";
 
 export class PubSubMicroValidated implements IPubSub
@@ -22,7 +22,7 @@ export class PubSubMicroValidated implements IPubSub
 
     constructor(wrappedPubSub?: IPubSub) {
         if (wrappedPubSub == undefined) {
-            wrappedPubSub = new PubSubRaw();
+            wrappedPubSub = new PubSubMicro();
         }
         this.pubsub = wrappedPubSub;
         this.stringValidator = new StringValidator();

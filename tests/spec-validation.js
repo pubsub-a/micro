@@ -8,7 +8,7 @@
     var PubSub;
 
     if (typeof window === "undefined") {
-        PubSub = require("../dist/pubsub-micro").PubSub;
+        PubSub = require("../dist/pubsub").PubSub;
     } else {
         PubSub = PubSubMicro.PubSub;
     }
