@@ -3,6 +3,11 @@ export interface StringValidationSettings {
     topicNameMaxLength: number;
 }
 
+interface TopicChannelNameValidator {
+    validateChannelName(name: string): void;
+    validateTopicName(name: string): void;
+}
+
 export class StringValidator {
     public settings: StringValidationSettings;
 

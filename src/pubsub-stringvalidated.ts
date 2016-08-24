@@ -12,20 +12,24 @@ import {
 } from 'pubsub-a-interface';
 
 import { Promise } from "es6-promise";
-import { PubSubMicro } from "./pubsub-micro";
+import { PubSubMicroUnvalidated } from "./pubsub-micro";
 import { StringValidator, StringValidationSettings } from "./string_validation";
 
-export class PubSubMicroValidated implements IPubSub
+export class PubSubMicro implements IPubSub
 {
     protected pubsub: IPubSub;
     protected stringValidator: StringValidator;
 
     constructor(wrappedPubSub?: IPubSub) {
         if (wrappedPubSub == undefined) {
-            wrappedPubSub = new PubSubMicro();
+            wrappedPubSub = new PubSubMicroUnvalidated();
         }
         this.pubsub = wrappedPubSub;
         this.stringValidator = new StringValidator();
+    }
+
+    setStringValidationSettings(settings: StringValidationSettings) {
+        this.stringValidator = new StringValidator(settings);
     }
 
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
