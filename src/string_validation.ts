@@ -1,17 +1,18 @@
-export interface StringValidationSettings {
+export interface DefaultTopicChannelNameValidatorSettings {
     channelNameMaxLength: number;
     topicNameMaxLength: number;
 }
 
-interface TopicChannelNameValidator {
+export interface TopicChannelNameValidator {
     validateChannelName(name: string): void;
     validateTopicName(name: string): void;
 }
 
-export class StringValidator {
-    public settings: StringValidationSettings;
-
-    constructor(settings?: StringValidationSettings) {
+export class DefaultTopicChannelNameValidator implements TopicChannelNameValidator {
+   
+    private settings: DefaultTopicChannelNameValidatorSettings;
+    
+    constructor(settings?: DefaultTopicChannelNameValidatorSettings) {
         if (!settings) {
             settings = {
                 channelNameMaxLength: 63,
@@ -35,9 +36,7 @@ export class StringValidator {
      * [A-Za-z0-9] plus the special characters: : _ - /
      */
     public validateChannelName(name: string) {
-        if (typeof name !== 'string')
-            throw new Error("Channel name must be of type string");
-        if (!name || name.length > this.settings.channelNameMaxLength)
+        if (name.length > this.settings.channelNameMaxLength)
             throw new Error(`Channel name must be between 1 and ${this.settings.channelNameMaxLength} characters long`);
 
         if (!this.containsOnlyValidChars(name)) {
@@ -53,9 +52,7 @@ export class StringValidator {
      * internally by PubSub implementations!
      */
     public validateTopicName(name: string) {
-        if (typeof name !== 'string')
-            throw new Error("Topic name must be of type string");
-        if (!name || name.length > this.settings.topicNameMaxLength)
+        if (name.length > this.settings.topicNameMaxLength)
             throw new Error(`Topic name must be between 1 and ${this.settings.topicNameMaxLength} characters long`);
 
         // quick return if there is no special characters

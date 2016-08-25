@@ -13,23 +13,23 @@ import {
 
 import { Promise } from "es6-promise";
 import { PubSubMicroUnvalidated } from "./pubsub-micro";
-import { StringValidator, StringValidationSettings } from "./string_validation";
+import { TopicChannelNameValidator, DefaultTopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string_validation";
 
 export class PubSubMicro implements IPubSub
 {
     protected pubsub: IPubSub;
-    protected stringValidator: StringValidator;
+    protected stringValidator: TopicChannelNameValidator;
 
     constructor(wrappedPubSub?: IPubSub) {
         if (wrappedPubSub == undefined) {
             wrappedPubSub = new PubSubMicroUnvalidated();
         }
         this.pubsub = wrappedPubSub;
-        this.stringValidator = new StringValidator();
+        this.stringValidator = new DefaultTopicChannelNameValidator();
     }
 
-    setStringValidationSettings(settings: StringValidationSettings) {
-        this.stringValidator = new StringValidator(settings);
+    setTopicChannelNameSettings(settings: DefaultTopicChannelNameValidatorSettings) {
+        this.stringValidator = new DefaultTopicChannelNameValidator(settings);
     }
 
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
@@ -41,8 +41,14 @@ export class PubSubMicro implements IPubSub
     }
     
     channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
-        // TODO automatically reject() the promise?
+        if (typeof name !== 'string')
+            throw new Error("Channel name must be of type string");
+        if (name == "")
+            throw new Error(`Channel name must be non-zerolength string`);
+        
         this.stringValidator.validateChannelName(name);
+    
+        // VALIDATION PASSED... 
      
         let wrappedCallback: IChannelReadyCallback;
         if (callback) {
@@ -65,29 +71,42 @@ export class PubSubMicro implements IPubSub
 class ChannelValidated implements IChannel {
     
     protected wrappedChannel: IChannel; 
-    protected stringValidator: StringValidator;
+    protected stringValidator: TopicChannelNameValidator;
     
     public name: string;
     
-    constructor(name: string, wrappedChannel: IChannel, stringValidator: StringValidator) {
+    constructor(name: string, wrappedChannel: IChannel, stringValidator: TopicChannelNameValidator) {
         this.name = name;
         this.wrappedChannel = wrappedChannel;
         this.stringValidator = stringValidator;
     }
     
+    setTopicChannelNameValidator(validator: TopicChannelNameValidator) {
+        this.stringValidator = validator;
+    }
+    
     publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void {
+        if (typeof topic !== 'string' || topic == "")
+            throw new Error("topic must be a non-zerolength string")
         this.stringValidator.validateTopicName(topic);
+        
         return this.wrappedChannel.publish<T>(topic, payload, callback);
     }
     
     subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>): Promise<ISubscriptionToken> {
+        if (typeof topic !== 'string' || topic == "")
+            throw new Error("topic must be a non-zerolength string")
         this.stringValidator.validateTopicName(topic);
         // TODO string validation
+   
         return this.wrappedChannel.subscribe<T>(topic, observer, callback);
     }
     
     once<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>): Promise<ISubscriptionToken> {
+        if (typeof topic !== 'string' || topic == "")
+            throw new Error("topic must be a non-zerolength string")
         this.stringValidator.validateTopicName(topic);
+        
         return this.wrappedChannel.once<T>(topic, observer, callback);
     }
 }
