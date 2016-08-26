@@ -9,9 +9,9 @@ export interface TopicChannelNameValidator {
 }
 
 export class DefaultTopicChannelNameValidator implements TopicChannelNameValidator {
-   
+
     private settings: DefaultTopicChannelNameValidatorSettings;
-    
+
     constructor(settings?: DefaultTopicChannelNameValidatorSettings) {
         if (!settings) {
             settings = {
