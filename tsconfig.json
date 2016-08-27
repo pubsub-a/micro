@@ -7,15 +7,7 @@
         "module": "commonjs",
         "strictNullChecks": true
     },
-    "files": [
-        "src/buckethash.ts",
-        "src/internal-interfaces.ts",
-        "src/pubsub-anonymous.ts",
-        "src/registry.ts",
-        "src/pubsub-micro.ts",
-        "src/pubsub-stringvalidated.ts",
-        "src/subscription-token.ts",
-        "src/util.ts",
-        "src/pubsub.ts"
+    "include": [
+        "src/*.ts"
     ]
 }

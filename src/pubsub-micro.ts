@@ -16,11 +16,17 @@ import { BucketHash, IBucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import Util from './util';
-import {PubSubMicro} from "./pubsub-stringvalidated";
+import {PubSubValidationWrapper} from "./validation-wrapper";
 
 export function invokeIfDefined(func: Function | undefined | null, ...args: any[]) {
     if (func) {
         func.apply(func, args);
+    }
+}
+
+export class PubSubMicroValidated extends PubSubValidationWrapper {
+    constructor() {
+        super(new PubSubMicroUnvalidated());
     }
 }
 

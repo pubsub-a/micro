@@ -1,5 +1,5 @@
 export {BucketHash} from "./buckethash";
-export {PubSubMicroUnvalidated, invokeIfDefined} from "./pubsub-micro";
-export {SubscriptionToken} from './subscription-token';
-export {PubSubMicro as PubSub} from "./pubsub-stringvalidated";
-export * from "./string_validation";
+export {PubSubMicroUnvalidated, PubSubMicroValidated as PubSub, invokeIfDefined} from "./pubsub-micro";
+export {SubscriptionToken} from "./subscription-token";
+export {PubSubValidationWrapper} from "./validation-wrapper";
+export * from "./string-validation";
