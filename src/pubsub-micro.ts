@@ -105,11 +105,17 @@ function internalIncludeIn(
 
 class Publisher<T> implements InternalInterfaces.IPublisher<T> {
 
-    constructor(public encodedTopic: string, private cache: IBucketHash<IObserverFunc<any>>) {
+    encodedTopic: string;
+
+    private bucket: IBucketHash<IObserverFunc<any>>;
+
+    constructor(encodedTopic: string, bucket: IBucketHash<IObserverFunc<any>>) {
+        this.encodedTopic = encodedTopic;
+        this.bucket = bucket;
     }
 
     publish(obj: T): void {
-        var subs = this.cache.get(this.encodedTopic);
+        var subs = this.bucket.get(this.encodedTopic);
         for (var i = 0; i < subs.length; i++) {
             subs[i](obj);
         }
@@ -136,8 +142,13 @@ class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
 
 class Channel implements IChannel {
 
-    constructor(public name: string, private bucket: IBucketHash<IObserverFunc<any>>) {
+    name: string;
+
+    private bucket: IBucketHash<IObserverFunc<any>>;
+
+    constructor(name: string, bucket: IBucketHash<IObserverFunc<any>>) {
         this.name = name;
+        this.bucket = bucket;
     }
 
     /**
@@ -176,13 +187,23 @@ class Channel implements IChannel {
     once<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>)
         : Promise<ISubscriptionToken> {
 
-        let subscription;
-        let subscribeAndDispose = ((payload: T) => {
-            subscription.dispose();
+        let promise: Promise<ISubscriptionToken>;
+        let alreadyRun = false;
+
+        let subscribeAndDispose: IObserverFunc<T> = ((payload: T) => {
+            if (alreadyRun) return;
+            alreadyRun = true;
+
+            promise.then(subs => {
+                // the user may dispose the subscription himself, so we need to check if it is still active
+                if (subs.isDisposed == false)
+                   subs.dispose();
+            });
             observer(payload);
         }).bind(observer);
-        subscription = this.subscribe<T>(topic, subscribeAndDispose, callback);
-        return Promise.resolve(subscription);
+
+        promise = this.subscribe<T>(topic, subscribeAndDispose, callback);
+        return promise;
     }
 
 }
