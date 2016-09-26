@@ -16,13 +16,8 @@ import { BucketHash, IBucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import Util from './util';
-import {PubSubValidationWrapper} from "./validation-wrapper";
-
-export function invokeIfDefined(func: Function | undefined | null, ...args: any[]) {
-    if (func) {
-        func.apply(func, args);
-    }
-}
+import { PubSubValidationWrapper } from "./validation-wrapper";
+import { invokeIfDefined, safeDispose } from "./helper";
 
 export class PubSubMicroValidated extends PubSubValidationWrapper {
     constructor() {
@@ -195,9 +190,8 @@ class Channel implements IChannel {
             alreadyRun = true;
 
             promise.then(subs => {
-                // the user may dispose the subscription himself, so we need to check if it is still active
-                if (subs.isDisposed == false)
-                   subs.dispose();
+                // the user may have disposed the subscription himself, so we need to check if it is still active
+                safeDispose(subs);
             });
             observer(payload);
         }).bind(observer);
