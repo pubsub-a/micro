@@ -87,7 +87,7 @@ class ChannelValidated implements IChannel {
 
     publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void {
         if (typeof topic !== 'string' || topic == "")
-            throw new Error("topic must be a non-zerolength string")
+            throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
         this.stringValidator.validateTopicName(topic);
 
         return this.wrappedChannel.publish<T>(topic, payload, callback);
@@ -95,7 +95,7 @@ class ChannelValidated implements IChannel {
 
     subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>): Promise<ISubscriptionToken> {
         if (typeof topic !== 'string' || topic == "")
-            throw new Error("topic must be a non-zerolength string")
+            throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
         this.stringValidator.validateTopicName(topic);
         // TODO string validation
 
