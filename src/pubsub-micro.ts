@@ -52,14 +52,6 @@ export class PubSubMicroUnvalidated implements IPubSub {
     public static includeIn(obj: any, publish_name?: string, subscribe_name?: string): any {
         return internalIncludeIn(obj, publish_name, subscribe_name);
     }
-
-    /**
-     * Helper functions that expose some internals that are reused in sister projects
-     */
-    public static BucketHash = BucketHash;
-    public static invokeIfDefined: any = invokeIfDefined;
-    public static SubscriptionToken: any = SubscriptionToken;
-    public static Util: any = Util;
 }
 
 
@@ -111,8 +103,13 @@ class Publisher<T> implements InternalInterfaces.IPublisher<T> {
 
     publish(obj: T): void {
         var subs = this.bucket.get(this.encodedTopic);
-        for (var i = 0; i < subs.length; i++) {
-            subs[i](obj);
+        for (let observer of subs) {
+            try {
+                observer(obj);
+            } catch (err) {
+                // we don't handle exceptions the observer functions throws,
+                // it is observer functions duty to catch errors and handle them
+            }
         }
     }
 }
