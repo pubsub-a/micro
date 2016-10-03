@@ -1,24 +1,14 @@
-/// <reference types="es6-promise" />
 import { IPubSub, IChannel, IPubSubStartCallback, IPubSubStopCallback, IChannelReadyCallback } from 'pubsub-a-interface';
-import { BucketHash } from './buckethash';
-import { StringValidationSettings } from "./string_validation";
-export declare function invokeIfDefined(func: Function | undefined | null, ...args: any[]): void;
-export { BucketHash } from "./buckethash";
-export { StringValidator, StringValidationSettings } from "./string_validation";
-export declare class PubSub implements IPubSub {
-    private subscriptionCache;
-    private stringValidator;
+import { Promise } from "es6-promise";
+import { PubSubValidationWrapper } from "./validation-wrapper";
+export declare class PubSubMicroValidated extends PubSubValidationWrapper {
     constructor();
-    setStringValidationLimits(settings: StringValidationSettings): void;
+}
+export declare class PubSubMicroUnvalidated implements IPubSub {
+    private subscriptionCache;
+    constructor();
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub>;
     stop(callback?: IPubSubStopCallback): Promise<void>;
     channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel>;
     static includeIn(obj: any, publish_name?: string, subscribe_name?: string): any;
-    /**
-     * Helper functions that expose some internals that are reused in sister projects
-     */
-    static BucketHash: typeof BucketHash;
-    static invokeIfDefined: any;
-    static SubscriptionToken: any;
-    static Util: any;
 }
