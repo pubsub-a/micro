@@ -25,6 +25,12 @@ export class PubSubMicroValidated extends PubSubValidationWrapper {
     }
 }
 
+function throwIfStopped(this: { isStopped: boolean }, msg?: string) {
+    if (this.isStopped) {
+        throw new Error(msg || "pubsub already stopped");
+    }
+}
+
 export class PubSubMicroUnvalidated implements IPubSub {
 
     public readonly subscriptionCache: BucketHash<IObserverFunc<any>>;
@@ -36,9 +42,7 @@ export class PubSubMicroUnvalidated implements IPubSub {
     }
 
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
-        if (this.isStopped) {
-            throw new Error("already stopped");
-        }
+        throwIfStopped.bind(this)();
         invokeIfDefined(callback, this, undefined, undefined);
         return Promise.resolve(this);
     }
@@ -50,6 +54,7 @@ export class PubSubMicroUnvalidated implements IPubSub {
     }
 
     channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
+        throwIfStopped.bind(this)();
         var channel = new Channel(name, this);
         invokeIfDefined(callback, channel);
         return Promise.resolve(channel);
@@ -146,10 +151,6 @@ class Channel implements IChannel {
         return this.pubsub.subscriptionCache;
     };
 
-    private get isStopped() {
-        return this.pubsub.isStopped;
-    }
-
     private readonly pubsub: PubSubMicroUnvalidated;
 
 
@@ -165,15 +166,13 @@ class Channel implements IChannel {
      *
      * For example, two different Channel object instances will trigger each others subscriptions this way.
      */
-    private encodeTopic(topic): string {
+    private encodeTopic(topic: string): string {
         const encodedTopic = `${this.name}_%_${topic}`;
         return encodedTopic;
     }
 
     publish<T>(topic: string, payload: T, callback?: Function) {
-        if (this.isStopped)
-            throw new Error("Cannot publish: PubSub instance already stopped");
-
+        throwIfStopped.bind(this.pubsub)();
         var publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
@@ -186,8 +185,7 @@ class Channel implements IChannel {
             throw new Error("observer function must be given and be of type function");
         }
 
-        if (this.isStopped)
-            throw new Error("Cannot subscribe: PubSub instance already stopped");
+        throwIfStopped.bind(this.pubsub)();
 
         const subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
         const subscription = subscriber.subscribe(observer);
