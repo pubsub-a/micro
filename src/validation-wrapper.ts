@@ -14,14 +14,20 @@ import {
 import { Promise } from "es6-promise";
 import { PubSubMicroUnvalidated } from "./pubsub-micro";
 import { TopicChannelNameValidator, DefaultTopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string-validation";
+import { invokeIfDefined } from "./helper";
+
 
 /**
- * Takes an IPubSub and wrapps it, additionally checking any channel and topic string names for validity.
+ * Takes an IPubSub and wrapps it, additionally checking any channel and topic string names for validity,
+ * makes sure only plain objects are published and optionally checks the message payload size.
  */
 export class PubSubValidationWrapper implements IPubSub
 {
     protected pubsub: IPubSub;
-    protected stringValidator: TopicChannelNameValidator;
+
+    public stringValidator: TopicChannelNameValidator;
+
+    public enablePlainObjectCheck = true;
 
     constructor(wrappedPubSub: IPubSub) {
         this.pubsub = wrappedPubSub;
@@ -53,14 +59,14 @@ export class PubSubValidationWrapper implements IPubSub
         let wrappedCallback: IChannelReadyCallback;
         if (callback) {
             wrappedCallback = (chan: IChannel) => {
-                const wrappedChannel = new ChannelValidated(name, chan, this.stringValidator);
+                const wrappedChannel = new ChannelValidated(name, chan, this);
                 callback(wrappedChannel);
             };
         }
         // TODO promise chaining
         return new Promise((resolve, reject) => {
             this.pubsub.channel(name, wrappedCallback).then(chan => {
-                const channel = new ChannelValidated(name, chan, this.stringValidator);
+                const channel = new ChannelValidated(name, chan, this);
                 resolve(channel);
             })
             // TODO reject() case
@@ -72,13 +78,29 @@ class ChannelValidated implements IChannel {
 
     protected wrappedChannel: IChannel;
     protected stringValidator: TopicChannelNameValidator;
+    protected pubsub: PubSubValidationWrapper;
+    protected enablePlainObjectCheck: boolean;
 
     public name: string;
 
-    constructor(name: string, wrappedChannel: IChannel, stringValidator: TopicChannelNameValidator) {
+    constructor(name: string, wrappedChannel: IChannel, pubsub: PubSubValidationWrapper) {
         this.name = name;
         this.wrappedChannel = wrappedChannel;
-        this.stringValidator = stringValidator;
+        this.stringValidator = pubsub.stringValidator;
+        this.enablePlainObjectCheck = pubsub.enablePlainObjectCheck;
+    }
+
+    /**
+     * If the users passes in an object, it must be a plain object. Strings, numbers, array etc. are ok.
+     */
+    private objectIsPlainObject(obj: any): boolean {
+        // TODO recursive checking, all corner cases etc.
+        // Use this poor-mans approach for now
+        if (typeof obj == 'object' && obj.constructor != Object) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     setTopicChannelNameValidator(validator: TopicChannelNameValidator) {
@@ -88,6 +110,13 @@ class ChannelValidated implements IChannel {
     publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void {
         if (typeof topic !== 'string' || topic == "")
             throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
+
+        if (this.enablePlainObjectCheck && !this.objectIsPlainObject(payload)) {
+            let err = new Error("only plain objects are allowed to be published");
+            invokeIfDefined(callback, err);
+            throw err;
+        }
+
         this.stringValidator.validateTopicName(topic);
 
         return this.wrappedChannel.publish<T>(topic, payload, callback);
