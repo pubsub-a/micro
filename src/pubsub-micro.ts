@@ -52,45 +52,6 @@ export class PubSubMicroUnvalidated implements IPubSub {
         return Promise.resolve(channel);
     }
 
-    public static includeIn(obj: any, publish_name?: string, subscribe_name?: string): any {
-        return internalIncludeIn(obj, publish_name, subscribe_name);
-    }
-}
-
-
-class AnonymousPubSub<T> {
-    private channel: IChannel;
-
-    private _subscribe(fn: IObserverFunc<T>) {
-        return this.channel.subscribe('a', fn);
-    }
-
-    private _publish(payload: T) {
-        return this.channel.publish('a', payload);
-    }
-
-    public subscribe: (fn: IObserverFunc<T>) => ISubscriptionToken;
-    public publish: (payload: T) => void;
-
-    constructor() {
-        var pubsub = new PubSubMicroUnvalidated();
-        pubsub.channel('__i', (chan) => { this.channel = chan });
-
-        this.subscribe = this._subscribe.bind(this);
-        this.publish = this._publish.bind(this);
-    }
-}
-
-function internalIncludeIn(
-    obj: Object,
-    publishName: string = 'publish',
-    subscribeName: string = 'subscribe'
-) {
-    // TODO obj must be instanceof/child of Object ?
-    var pubsub = new AnonymousPubSub();
-    obj[subscribeName] = pubsub.subscribe;
-    obj[publishName] = pubsub.publish;
-    return obj;
 }
 
 class Publisher<T> implements InternalInterfaces.IPublisher<T> {
