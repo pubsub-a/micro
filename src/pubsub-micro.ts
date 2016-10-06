@@ -25,36 +25,25 @@ export class PubSubMicroValidated extends PubSubValidationWrapper {
     }
 }
 
-function throwIfStopped(this: { isStopped: boolean }, msg?: string) {
-    if (this.isStopped) {
-        throw new Error(msg || "pubsub already stopped");
-    }
-}
-
 export class PubSubMicroUnvalidated implements IPubSub {
 
     public readonly subscriptionCache: BucketHash<IObserverFunc<any>>;
-
-    public isStopped = false;
 
     constructor() {
         this.subscriptionCache = new BucketHash<IObserverFunc<any>>();
     }
 
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
-        throwIfStopped.bind(this)();
         invokeIfDefined(callback, this, undefined, undefined);
         return Promise.resolve(this);
     }
 
     stop(callback?: IPubSubStopCallback): Promise<void> {
-        this.isStopped = true;
         invokeIfDefined(callback);
         return Promise.resolve(void 0);
     }
 
     channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
-        throwIfStopped.bind(this)();
         var channel = new Channel(name, this);
         invokeIfDefined(callback, channel);
         return Promise.resolve(channel);
@@ -172,7 +161,6 @@ class Channel implements IChannel {
     }
 
     publish<T>(topic: string, payload: T, callback?: Function) {
-        throwIfStopped.bind(this.pubsub)();
         var publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
@@ -184,8 +172,6 @@ class Channel implements IChannel {
         if (!observer) {
             throw new Error("observer function must be given and be of type function");
         }
-
-        throwIfStopped.bind(this.pubsub)();
 
         const subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
         const subscription = subscriber.subscribe(observer);
