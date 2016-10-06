@@ -29,6 +29,8 @@ export class PubSubMicroUnvalidated implements IPubSub {
 
     public readonly subscriptionCache: BucketHash<IObserverFunc<any>>;
 
+    public isStopped = false;
+
     constructor() {
         this.subscriptionCache = new BucketHash<IObserverFunc<any>>();
     }
@@ -39,6 +41,7 @@ export class PubSubMicroUnvalidated implements IPubSub {
     }
 
     stop(callback?: IPubSubStopCallback): Promise<void> {
+        this.isStopped = true;
         invokeIfDefined(callback);
         return Promise.resolve(void 0);
     }
@@ -142,7 +145,6 @@ class Channel implements IChannel {
 
     private readonly pubsub: PubSubMicroUnvalidated;
 
-
     constructor(name: string, pubsub: PubSubMicroUnvalidated) {
         this.name = name;
         this.pubsub = pubsub;
@@ -160,10 +162,11 @@ class Channel implements IChannel {
         return encodedTopic;
     }
 
-    publish<T>(topic: string, payload: T, callback?: Function) {
+    publish<T>(topic: string, payload: T, callback?: Function): Promise<any> {
         var publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
+        return Promise.resolve();
     }
 
     subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>)

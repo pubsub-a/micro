@@ -120,7 +120,7 @@ class ChannelValidated implements IChannel {
         this.stringValidator = validator;
     }
 
-    publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback<T>): void {
+    publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback): Promise<any> {
         throwIfStopped.bind(this.pubsub)();
         if (typeof topic !== 'string' || topic == "")
             throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
