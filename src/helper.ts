@@ -1,12 +1,14 @@
 import { ISubscriptionToken } from "pubsub-a-interface";
+import { Promise } from "es6-promise";
 
-export function safeDispose(token: ISubscriptionToken): void {
+export function safeDispose(token: ISubscriptionToken): Promise<number | undefined> {
     if (!token)
         throw new Error("token must be defined!");
 
     if (!token.isDisposed)
-        token.dispose();
-
+        return token.dispose();
+    else
+        return Promise.resolve(undefined);
 }
 
 export function invokeIfDefined(func: Function | undefined | null, ...args: any[]) {
