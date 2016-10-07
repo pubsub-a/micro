@@ -1,8 +1,8 @@
 "use strict";
 var SubscriptionToken = (function () {
-    function SubscriptionToken(disposeFn, count) {
+    function SubscriptionToken(onDispose, count) {
         this.isDisposed = false;
-        this.disposeFn = disposeFn;
+        this.disposeFn = onDispose;
         this.count = count ? count : 0;
     }
     SubscriptionToken.prototype.dispose = function (callback) {

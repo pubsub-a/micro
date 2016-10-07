@@ -233,6 +233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.PubSubMicroValidated = PubSubMicroValidated;
 	var PubSubMicroUnvalidated = (function () {
 	    function PubSubMicroUnvalidated() {
+	        this.isStopped = false;
 	        this.subscriptionCache = new buckethash_1.BucketHash();
 	    }
 	    PubSubMicroUnvalidated.prototype.start = function (callback, disconnect) {
@@ -240,45 +241,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return es6_promise_1.Promise.resolve(this);
 	    };
 	    PubSubMicroUnvalidated.prototype.stop = function (callback) {
+	        this.isStopped = true;
 	        helper_1.invokeIfDefined(callback);
 	        return es6_promise_1.Promise.resolve(void 0);
 	    };
 	    PubSubMicroUnvalidated.prototype.channel = function (name, callback) {
-	        var channel = new Channel(name, this.subscriptionCache);
+	        var channel = new Channel(name, this);
 	        helper_1.invokeIfDefined(callback, channel);
 	        return es6_promise_1.Promise.resolve(channel);
-	    };
-	    PubSubMicroUnvalidated.includeIn = function (obj, publish_name, subscribe_name) {
-	        return internalIncludeIn(obj, publish_name, subscribe_name);
 	    };
 	    return PubSubMicroUnvalidated;
 	}());
 	exports.PubSubMicroUnvalidated = PubSubMicroUnvalidated;
-	var AnonymousPubSub = (function () {
-	    function AnonymousPubSub() {
-	        var _this = this;
-	        var pubsub = new PubSubMicroUnvalidated();
-	        pubsub.channel('__i', function (chan) { _this.channel = chan; });
-	        this.subscribe = this._subscribe.bind(this);
-	        this.publish = this._publish.bind(this);
-	    }
-	    AnonymousPubSub.prototype._subscribe = function (fn) {
-	        return this.channel.subscribe('a', fn);
-	    };
-	    AnonymousPubSub.prototype._publish = function (payload) {
-	        return this.channel.publish('a', payload);
-	    };
-	    return AnonymousPubSub;
-	}());
-	function internalIncludeIn(obj, publishName, subscribeName) {
-	    if (publishName === void 0) { publishName = 'publish'; }
-	    if (subscribeName === void 0) { subscribeName = 'subscribe'; }
-	    // TODO obj must be instanceof/child of Object ?
-	    var pubsub = new AnonymousPubSub();
-	    obj[subscribeName] = pubsub.subscribe;
-	    obj[publishName] = pubsub.publish;
-	    return obj;
-	}
 	var Publisher = (function () {
 	    function Publisher(encodedTopic, bucket) {
 	        this.encodedTopic = encodedTopic;
@@ -305,20 +279,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Subscriber.prototype.subscribe = function (observer) {
 	        var _this = this;
 	        var number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
-	        var dispose = function (callback) {
+	        var onDispose = function (callback) {
 	            var remaining = _this.bucket.remove(_this.encodedTopic, observer);
 	            helper_1.invokeIfDefined(callback, remaining);
-	            return remaining;
+	            return es6_promise_1.Promise.resolve(remaining);
 	        };
-	        return new subscription_token_1.SubscriptionToken(dispose, number_of_subscriptions);
+	        return new subscription_token_1.SubscriptionToken(onDispose, number_of_subscriptions);
 	    };
 	    return Subscriber;
 	}());
 	var Channel = (function () {
-	    function Channel(name, bucket) {
+	    function Channel(name, pubsub) {
 	        this.name = name;
-	        this.bucket = bucket;
+	        this.pubsub = pubsub;
 	    }
+	    Object.defineProperty(Channel.prototype, "bucket", {
+	        get: function () {
+	            return this.pubsub.subscriptionCache;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    ;
 	    /**
 	     * We encode the channel namen and the topic into a single string to place in the BucketHash.
 	     * This way all channel/topic combinations will share subscriptions, independent of the current
@@ -334,6 +316,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var publisher = new Publisher(this.encodeTopic(topic), this.bucket);
 	        publisher.publish(payload);
 	        helper_1.invokeIfDefined(callback, topic, payload);
+	        return es6_promise_1.Promise.resolve();
 	    };
 	    Channel.prototype.subscribe = function (topic, observer, callback) {
 	        if (!observer) {
@@ -1722,9 +1705,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	"use strict";
 	var SubscriptionToken = (function () {
-	    function SubscriptionToken(disposeFn, count) {
+	    function SubscriptionToken(onDispose, count) {
 	        this.isDisposed = false;
-	        this.disposeFn = disposeFn;
+	        this.disposeFn = onDispose;
 	        this.count = count ? count : 0;
 	    }
 	    SubscriptionToken.prototype.dispose = function (callback) {
@@ -1746,11 +1729,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	"use strict";
 	var es6_promise_1 = __webpack_require__(3);
 	var string_validation_1 = __webpack_require__(8);
+	var helper_1 = __webpack_require__(9);
+	function throwIfStopped(msg) {
+	    if (this.isStopped) {
+	        throw new Error(msg || "pubsub already stopped");
+	    }
+	}
 	/**
-	 * Takes an IPubSub and wrapps it, additionally checking any channel and topic string names for validity.
+	 * Takes an IPubSub and wrapps it, additionally checking
+	 * - any channel and topic string names for validity
+	 * - the correct stop/start behaviour and throws exception if used after stopped
+	 * - makes sure only plain objects are published and optionally checks the message payload size.
 	 */
 	var PubSubValidationWrapper = (function () {
 	    function PubSubValidationWrapper(wrappedPubSub) {
+	        this.enablePlainObjectCheck = true;
+	        this.isStopped = false;
 	        this.pubsub = wrappedPubSub;
 	        this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator();
 	    }
@@ -1758,13 +1752,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator(settings);
 	    };
 	    PubSubValidationWrapper.prototype.start = function (callback, disconnect) {
+	        throwIfStopped.bind(this)();
 	        return this.pubsub.start(callback, disconnect);
 	    };
 	    PubSubValidationWrapper.prototype.stop = function (callback) {
+	        this.isStopped = true;
 	        return this.pubsub.stop(callback);
 	    };
 	    PubSubValidationWrapper.prototype.channel = function (name, callback) {
 	        var _this = this;
+	        throwIfStopped.bind(this)();
 	        if (typeof name !== 'string')
 	            throw new Error("Channel name must be of type string");
 	        if (name == "")
@@ -1774,14 +1771,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var wrappedCallback;
 	        if (callback) {
 	            wrappedCallback = function (chan) {
-	                var wrappedChannel = new ChannelValidated(name, chan, _this.stringValidator);
+	                var wrappedChannel = new ChannelValidated(name, chan, _this);
 	                callback(wrappedChannel);
 	            };
 	        }
 	        // TODO promise chaining
 	        return new es6_promise_1.Promise(function (resolve, reject) {
 	            _this.pubsub.channel(name, wrappedCallback).then(function (chan) {
-	                var channel = new ChannelValidated(name, chan, _this.stringValidator);
+	                var channel = new ChannelValidated(name, chan, _this);
 	                resolve(channel);
 	            });
 	            // TODO reject() case
@@ -1791,21 +1788,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	}());
 	exports.PubSubValidationWrapper = PubSubValidationWrapper;
 	var ChannelValidated = (function () {
-	    function ChannelValidated(name, wrappedChannel, stringValidator) {
+	    function ChannelValidated(name, wrappedChannel, pubsub) {
 	        this.name = name;
 	        this.wrappedChannel = wrappedChannel;
-	        this.stringValidator = stringValidator;
+	        this.pubsub = pubsub;
+	        this.stringValidator = pubsub.stringValidator;
+	        this.enablePlainObjectCheck = pubsub.enablePlainObjectCheck;
 	    }
+	    /**
+	     * If the users passes in an object, it must be a plain object. Strings, numbers, array etc. are ok.
+	     */
+	    ChannelValidated.prototype.objectIsPlainObject = function (obj) {
+	        // TODO recursive checking, all corner cases etc.
+	        // Use this poor-mans approach for now
+	        if (typeof obj == 'object' && obj.constructor != Object) {
+	            return false;
+	        }
+	        else {
+	            return true;
+	        }
+	    };
 	    ChannelValidated.prototype.setTopicChannelNameValidator = function (validator) {
 	        this.stringValidator = validator;
 	    };
 	    ChannelValidated.prototype.publish = function (topic, payload, callback) {
+	        throwIfStopped.bind(this.pubsub)();
 	        if (typeof topic !== 'string' || topic == "")
 	            throw new Error("topic must be a non-zerolength string, was: " + topic);
+	        if (this.enablePlainObjectCheck && !this.objectIsPlainObject(payload)) {
+	            var err = new Error("only plain objects are allowed to be published");
+	            helper_1.invokeIfDefined(callback, err);
+	            throw err;
+	        }
 	        this.stringValidator.validateTopicName(topic);
 	        return this.wrappedChannel.publish(topic, payload, callback);
 	    };
 	    ChannelValidated.prototype.subscribe = function (topic, observer, callback) {
+	        throwIfStopped.bind(this.pubsub)();
 	        if (typeof topic !== 'string' || topic == "")
 	            throw new Error("topic must be a non-zerolength string, was: " + topic);
 	        this.stringValidator.validateTopicName(topic);
@@ -1813,6 +1832,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return this.wrappedChannel.subscribe(topic, observer, callback);
 	    };
 	    ChannelValidated.prototype.once = function (topic, observer, callback) {
+	        throwIfStopped.bind(this.pubsub)();
 	        if (typeof topic !== 'string' || topic == "")
 	            throw new Error("topic must be a non-zerolength string");
 	        this.stringValidator.validateTopicName(topic);
@@ -1884,14 +1904,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 9 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	var es6_promise_1 = __webpack_require__(3);
 	function safeDispose(token) {
 	    if (!token)
 	        throw new Error("token must be defined!");
 	    if (!token.isDisposed)
-	        token.dispose();
+	        return token.dispose();
+	    else
+	        return es6_promise_1.Promise.resolve(undefined);
 	}
 	exports.safeDispose = safeDispose;
 	function invokeIfDefined(func) {

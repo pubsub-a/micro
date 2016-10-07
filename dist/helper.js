@@ -1,9 +1,12 @@
 "use strict";
+var es6_promise_1 = require("es6-promise");
 function safeDispose(token) {
     if (!token)
         throw new Error("token must be defined!");
     if (!token.isDisposed)
-        token.dispose();
+        return token.dispose();
+    else
+        return es6_promise_1.Promise.resolve(undefined);
 }
 exports.safeDispose = safeDispose;
 function invokeIfDefined(func) {

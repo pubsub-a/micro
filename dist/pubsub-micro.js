@@ -19,6 +19,7 @@ var PubSubMicroValidated = (function (_super) {
 exports.PubSubMicroValidated = PubSubMicroValidated;
 var PubSubMicroUnvalidated = (function () {
     function PubSubMicroUnvalidated() {
+        this.isStopped = false;
         this.subscriptionCache = new buckethash_1.BucketHash();
     }
     PubSubMicroUnvalidated.prototype.start = function (callback, disconnect) {
@@ -26,45 +27,18 @@ var PubSubMicroUnvalidated = (function () {
         return es6_promise_1.Promise.resolve(this);
     };
     PubSubMicroUnvalidated.prototype.stop = function (callback) {
+        this.isStopped = true;
         helper_1.invokeIfDefined(callback);
         return es6_promise_1.Promise.resolve(void 0);
     };
     PubSubMicroUnvalidated.prototype.channel = function (name, callback) {
-        var channel = new Channel(name, this.subscriptionCache);
+        var channel = new Channel(name, this);
         helper_1.invokeIfDefined(callback, channel);
         return es6_promise_1.Promise.resolve(channel);
-    };
-    PubSubMicroUnvalidated.includeIn = function (obj, publish_name, subscribe_name) {
-        return internalIncludeIn(obj, publish_name, subscribe_name);
     };
     return PubSubMicroUnvalidated;
 }());
 exports.PubSubMicroUnvalidated = PubSubMicroUnvalidated;
-var AnonymousPubSub = (function () {
-    function AnonymousPubSub() {
-        var _this = this;
-        var pubsub = new PubSubMicroUnvalidated();
-        pubsub.channel('__i', function (chan) { _this.channel = chan; });
-        this.subscribe = this._subscribe.bind(this);
-        this.publish = this._publish.bind(this);
-    }
-    AnonymousPubSub.prototype._subscribe = function (fn) {
-        return this.channel.subscribe('a', fn);
-    };
-    AnonymousPubSub.prototype._publish = function (payload) {
-        return this.channel.publish('a', payload);
-    };
-    return AnonymousPubSub;
-}());
-function internalIncludeIn(obj, publishName, subscribeName) {
-    if (publishName === void 0) { publishName = 'publish'; }
-    if (subscribeName === void 0) { subscribeName = 'subscribe'; }
-    // TODO obj must be instanceof/child of Object ?
-    var pubsub = new AnonymousPubSub();
-    obj[subscribeName] = pubsub.subscribe;
-    obj[publishName] = pubsub.publish;
-    return obj;
-}
 var Publisher = (function () {
     function Publisher(encodedTopic, bucket) {
         this.encodedTopic = encodedTopic;
@@ -91,20 +65,28 @@ var Subscriber = (function () {
     Subscriber.prototype.subscribe = function (observer) {
         var _this = this;
         var number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
-        var dispose = function (callback) {
+        var onDispose = function (callback) {
             var remaining = _this.bucket.remove(_this.encodedTopic, observer);
             helper_1.invokeIfDefined(callback, remaining);
-            return remaining;
+            return es6_promise_1.Promise.resolve(remaining);
         };
-        return new subscription_token_1.SubscriptionToken(dispose, number_of_subscriptions);
+        return new subscription_token_1.SubscriptionToken(onDispose, number_of_subscriptions);
     };
     return Subscriber;
 }());
 var Channel = (function () {
-    function Channel(name, bucket) {
+    function Channel(name, pubsub) {
         this.name = name;
-        this.bucket = bucket;
+        this.pubsub = pubsub;
     }
+    Object.defineProperty(Channel.prototype, "bucket", {
+        get: function () {
+            return this.pubsub.subscriptionCache;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    ;
     /**
      * We encode the channel namen and the topic into a single string to place in the BucketHash.
      * This way all channel/topic combinations will share subscriptions, independent of the current
@@ -120,6 +102,7 @@ var Channel = (function () {
         var publisher = new Publisher(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         helper_1.invokeIfDefined(callback, topic, payload);
+        return es6_promise_1.Promise.resolve();
     };
     Channel.prototype.subscribe = function (topic, observer, callback) {
         if (!observer) {
