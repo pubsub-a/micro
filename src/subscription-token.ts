@@ -1,18 +1,23 @@
-import { ISubscriptionToken, SubscriptionDisposedCallback, disposeFunction } from 'pubsub-a-interface';
+import { ISubscriptionToken, ISubscriptionDisposedCallback } from 'pubsub-a-interface';
+import { Promise } from "es6-promise";
+
+export interface DisposeFunction {
+    (callback?: ISubscriptionDisposedCallback): Promise<number>;
+}
 
 export class SubscriptionToken implements ISubscriptionToken {
 
     public isDisposed: boolean = false;
     public count: number;
 
-    private disposeFn: disposeFunction;
+    private disposeFn: Function;
 
-    constructor(disposeFn: disposeFunction, count?: number) {
-        this.disposeFn = disposeFn;
+    constructor(onDispose: DisposeFunction, count?: number) {
+        this.disposeFn = onDispose;
         this.count = count ? count : 0;
     }
 
-    dispose(callback?: SubscriptionDisposedCallback) {
+    dispose(callback?: ISubscriptionDisposedCallback): Promise<number> {
         if (this.isDisposed) {
             throw new Error('Subscription is already disposed');
         }

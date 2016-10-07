@@ -7,7 +7,7 @@ import {
     IPubSubStartCallback,
     IPubSubStopCallback,
     IChannelReadyCallback,
-    SubscriptionDisposedCallback,
+    ISubscriptionDisposedCallback,
     ISubscriptionRegisteredCallback
 } from 'pubsub-a-interface';
 

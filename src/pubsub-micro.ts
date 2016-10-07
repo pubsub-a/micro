@@ -7,7 +7,7 @@ import {
     IPubSubStartCallback,
     IPubSubStopCallback,
     IChannelReadyCallback,
-    SubscriptionDisposedCallback,
+    ISubscriptionDisposedCallback,
     ISubscriptionRegisteredCallback
 } from 'pubsub-a-interface';
 
@@ -84,15 +84,15 @@ class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
     }
 
     subscribe(observer: IObserverFunc<T>): ISubscriptionToken {
-        var number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
+        const number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
 
-        var dispose = (callback?: SubscriptionDisposedCallback) => {
+        const onDispose = (callback?: ISubscriptionDisposedCallback) => {
             var remaining = this.bucket.remove(this.encodedTopic, observer);
             invokeIfDefined(callback, remaining);
-            return remaining;
+            return Promise.resolve(remaining);
         };
 
-        return new SubscriptionToken(dispose, number_of_subscriptions);
+        return new SubscriptionToken(onDispose, number_of_subscriptions);
     }
 }
 
