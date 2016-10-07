@@ -1,4 +1,4 @@
-import { IPubSub } from 'pubsub-a-interface';
+import { IPubSub } from 'pubsub-a-interfaces';
 
 var provider = [];
 

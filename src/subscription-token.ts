@@ -1,4 +1,4 @@
-import { ISubscriptionToken, ISubscriptionDisposedCallback } from 'pubsub-a-interface';
+import { ISubscriptionToken, ISubscriptionDisposedCallback } from 'pubsub-a-interfaces';
 import { Promise } from "es6-promise";
 
 export interface DisposeFunction {

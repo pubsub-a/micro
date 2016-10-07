@@ -1,4 +1,4 @@
-import { IObserverFunc, ISubscriptionToken } from 'pubsub-a-interface';
+import { IObserverFunc, ISubscriptionToken } from 'pubsub-a-interfaces';
 export interface IPublisher<T> {
     publish(obj: T, callback?: Function): void;
 }

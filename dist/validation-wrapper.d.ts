@@ -1,4 +1,4 @@
-import { IPubSub, IChannel, IPubSubStartCallback, IPubSubStopCallback, IChannelReadyCallback } from 'pubsub-a-interface';
+import { IPubSub, IChannel, IPubSubStartCallback, IPubSubStopCallback, IChannelReadyCallback } from 'pubsub-a-interfaces';
 import { Promise } from "es6-promise";
 import { TopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string-validation";
 /**

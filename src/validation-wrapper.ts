@@ -9,7 +9,7 @@ import {
     IChannelReadyCallback,
     ISubscriptionDisposedCallback,
     ISubscriptionRegisteredCallback
-} from 'pubsub-a-interface';
+} from 'pubsub-a-interfaces';
 
 import { Promise } from "es6-promise";
 import { PubSubMicroUnvalidated } from "./pubsub-micro";
