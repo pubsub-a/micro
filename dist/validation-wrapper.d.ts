@@ -14,7 +14,7 @@ export declare class PubSubValidationWrapper implements IPubSub {
     isStopped: boolean;
     constructor(wrappedPubSub: IPubSub);
     setTopicChannelNameSettings(settings: DefaultTopicChannelNameValidatorSettings): void;
-    start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub>;
+    start(callback?: IPubSubStartCallback, onStopByExternal?: Function): Promise<IPubSub>;
     stop(callback?: IPubSubStopCallback): Promise<void>;
     channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel>;
 }
