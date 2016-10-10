@@ -1,6 +1,9 @@
 export interface DefaultTopicChannelNameValidatorSettings {
     channelNameMaxLength: number;
     topicNameMaxLength: number;
+
+    // if we allow _%_ and _$_ in topics
+    allowSpecialTopicSequences: boolean;
 }
 
 export interface TopicChannelNameValidator {
@@ -16,7 +19,8 @@ export class DefaultTopicChannelNameValidator implements TopicChannelNameValidat
         if (!settings) {
             settings = {
                 channelNameMaxLength: 63,
-                topicNameMaxLength: 255
+                topicNameMaxLength: 255,
+                allowSpecialTopicSequences: false
             };
         }
         this.settings = settings;
@@ -34,6 +38,7 @@ export class DefaultTopicChannelNameValidator implements TopicChannelNameValidat
     /**
      * Validates a channel to be between 1 and 63 characters long and consists only of
      * [A-Za-z0-9] plus the special characters: : _ - /
+     *
      */
     public validateChannelName(name: string) {
         if (name.length > this.settings.channelNameMaxLength)
@@ -58,6 +63,10 @@ export class DefaultTopicChannelNameValidator implements TopicChannelNameValidat
         // quick return if there is no special characters
         if (this.containsOnlyValidChars(name))
             return;
+
+        // quick return to avoid regex
+        if (!this.settings.allowSpecialTopicSequences)
+            throw new Error(`Topic name contains unallowed character(s): ${name}`);
 
         // EXCEPTION: the special sequence _$_ and _%_ are allowed
         let repl = name;

@@ -91,7 +91,11 @@ export class PubSubValidationWrapper implements IPubSub
 class ChannelValidated implements IChannel {
 
     protected wrappedChannel: IChannel;
-    protected stringValidator: TopicChannelNameValidator;
+
+    protected get stringValidator(): TopicChannelNameValidator {
+        return this.pubsub.stringValidator;
+    }
+
     protected pubsub: PubSubValidationWrapper;
     protected enablePlainObjectCheck: boolean;
 
@@ -101,7 +105,6 @@ class ChannelValidated implements IChannel {
         this.name = name;
         this.wrappedChannel = wrappedChannel;
         this.pubsub = pubsub;
-        this.stringValidator = pubsub.stringValidator;
         this.enablePlainObjectCheck = pubsub.enablePlainObjectCheck;
     }
 
@@ -116,10 +119,6 @@ class ChannelValidated implements IChannel {
         } else {
             return true;
         }
-    }
-
-    setTopicChannelNameValidator(validator: TopicChannelNameValidator) {
-        this.stringValidator = validator;
     }
 
     publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback): Promise<any> {
