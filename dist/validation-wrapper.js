@@ -66,9 +66,15 @@ var ChannelValidated = (function () {
         this.name = name;
         this.wrappedChannel = wrappedChannel;
         this.pubsub = pubsub;
-        this.stringValidator = pubsub.stringValidator;
         this.enablePlainObjectCheck = pubsub.enablePlainObjectCheck;
     }
+    Object.defineProperty(ChannelValidated.prototype, "stringValidator", {
+        get: function () {
+            return this.pubsub.stringValidator;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * If the users passes in an object, it must be a plain object. Strings, numbers, array etc. are ok.
      */
@@ -81,9 +87,6 @@ var ChannelValidated = (function () {
         else {
             return true;
         }
-    };
-    ChannelValidated.prototype.setTopicChannelNameValidator = function (validator) {
-        this.stringValidator = validator;
     };
     ChannelValidated.prototype.publish = function (topic, payload, callback) {
         if (typeof topic !== 'string' || topic == "")

@@ -1,6 +1,7 @@
 export interface DefaultTopicChannelNameValidatorSettings {
     channelNameMaxLength: number;
     topicNameMaxLength: number;
+    allowSpecialTopicSequences: boolean;
 }
 export interface TopicChannelNameValidator {
     validateChannelName(name: string): void;
@@ -16,6 +17,7 @@ export declare class DefaultTopicChannelNameValidator implements TopicChannelNam
     /**
      * Validates a channel to be between 1 and 63 characters long and consists only of
      * [A-Za-z0-9] plus the special characters: : _ - /
+     *
      */
     validateChannelName(name: string): void;
     /**

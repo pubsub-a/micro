@@ -1794,9 +1794,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.name = name;
 	        this.wrappedChannel = wrappedChannel;
 	        this.pubsub = pubsub;
-	        this.stringValidator = pubsub.stringValidator;
 	        this.enablePlainObjectCheck = pubsub.enablePlainObjectCheck;
 	    }
+	    Object.defineProperty(ChannelValidated.prototype, "stringValidator", {
+	        get: function () {
+	            return this.pubsub.stringValidator;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    /**
 	     * If the users passes in an object, it must be a plain object. Strings, numbers, array etc. are ok.
 	     */
@@ -1809,9 +1815,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	        else {
 	            return true;
 	        }
-	    };
-	    ChannelValidated.prototype.setTopicChannelNameValidator = function (validator) {
-	        this.stringValidator = validator;
 	    };
 	    ChannelValidated.prototype.publish = function (topic, payload, callback) {
 	        if (typeof topic !== 'string' || topic == "")
@@ -1859,7 +1862,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (!settings) {
 	            settings = {
 	                channelNameMaxLength: 63,
-	                topicNameMaxLength: 255
+	                topicNameMaxLength: 255,
+	                allowSpecialTopicSequences: false
 	            };
 	        }
 	        this.settings = settings;
@@ -1876,6 +1880,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	     * Validates a channel to be between 1 and 63 characters long and consists only of
 	     * [A-Za-z0-9] plus the special characters: : _ - /
+	     *
 	     */
 	    DefaultTopicChannelNameValidator.prototype.validateChannelName = function (name) {
 	        if (name.length > this.settings.channelNameMaxLength)
@@ -1897,6 +1902,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // quick return if there is no special characters
 	        if (this.containsOnlyValidChars(name))
 	            return;
+	        // quick return to avoid regex
+	        if (!this.settings.allowSpecialTopicSequences)
+	            throw new Error("Topic name contains unallowed character(s): " + name);
 	        // EXCEPTION: the special sequence _$_ and _%_ are allowed
 	        var repl = name;
 	        repl = repl.replace(/_\$_/g, '');
