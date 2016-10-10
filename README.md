@@ -4,6 +4,9 @@ PubSub/A Reference Implementation
 This is the reference implementation of the [PubSub/A interface proposal][pubsub-interfaces]. The
 implementation is written in TypeScript but can be consumed from any JavaScript code.
 
+While PubSub/A is designed to work over the network, this reference implementation only works
+locally. Subscriptions are only share among the same instance of the PubSubMicro instance.
+
 Building and Installation
 -------------------------
 
@@ -43,30 +46,24 @@ pubsub.start(function() {
     });
 });
 
-// instead of topics, use object instance or DOM node
-var myObject = document.querySelector('#myDomNode');
-
-PubSub.includeIn(myObject);
-
-myObject.subscribe(function(arg) {
-  console.log('received arg: ', arg);
+// Instead of callback, you can use promises (requires ES6 promises or shim)
+pubsub.start()
+    .then(function() {
+        return pubsub.channel('myChannel');
+    }).then(function(channel) {
+        channel.subscribe('myTopic', function(arg) {
+            console.log('received arg: ', arg);
+        });
+        channel.publish('myTopic', { foo: 'bar' });
+    });
 });
-
-myObject.publish({ foo: 'bar' });
-
-// you can rename the publish/subscribe functions to anything:
-var otherObject = {};
-PubSub.includeIn(otherObject, 'myPublish', 'mySubscribe');
-otherObject.myPublish('Hello world!');
-
-
 ```
 
-See the [PubSub/A interface proposal][pubsub-interfaces] for in-depth syntax overview.
+See the [PubSub/A interface definition][pubsub-interfaces] for in-depth syntax overview.
 
 License
 -------
-Licensed under MIT license.
+This reference implementation is licensed under the MIT license.
 
 
   [pubsub-interfaces]: https://github.com/pubsub-a/pubsub-interfaces
