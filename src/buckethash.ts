@@ -1,15 +1,7 @@
-
-export interface IBucketHash<T> {
-    add(key: string, item: T): number;
-    remove(key: string, item: T): number;
-    get(key: string): Array<T>;
-    exists(key: string): boolean;
-}
-
 /**
  * A Hashtable that contains a flat list of entries (bucket) for a given key.
  */
-export class BucketHash<T> implements IBucketHash<T> {
+export class BucketHash<T> {
     private dict: Object = {};
 
     /**
@@ -19,7 +11,7 @@ export class BucketHash<T> implements IBucketHash<T> {
     private encodeKey(key: string): string {
         // prevent using JS internal properties of Object by using a prefix
         // for all keys
-        return '%' + key;
+        return `%${key}`;
     }
 
     private decodeKey(key: string): string {
@@ -48,12 +40,12 @@ export class BucketHash<T> implements IBucketHash<T> {
 
     /**
      * Returns the bucket of a given key.
-     * @param  {string}   key
+     * @param  {string}       key
      * @return {Array<T>}     The bucket or an empty Array
      */
     get(key: string): Array<T> {
         var encodedKey = this.encodeKey(key);
-        return this.dict[encodedKey] || [];
+        return this.dict[encodedKey] || [];
     }
 
     /**
@@ -61,11 +53,11 @@ export class BucketHash<T> implements IBucketHash<T> {
      * @return {Array<string>}
      */
     keys(): Array<string> {
-        const result = [];
+        const result: Array<string> = [];
         for (let key of Object.keys(this.dict)) {
             if (key[0] === '%') {
                 let decodedKey = this.decodeKey(key);
-                (result as any).push(decodedKey as any);
+                result.push(decodedKey);
             }
         };
         return result;
@@ -92,7 +84,7 @@ export class BucketHash<T> implements IBucketHash<T> {
 
     /**
      * Removes an element from the bucket at key. Will throw an exception if the element is not
-     * in the bucket. Will throw an exception if there is no bucket for this key.
+     * in the bucket.
      * @param  {string} key
      * @param  {T}      item
      * @return {number}      The number of items in the bucket AFTER the element has been removed.

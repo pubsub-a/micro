@@ -1,13 +1,7 @@
-export interface IBucketHash<T> {
-    add(key: string, item: T): number;
-    remove(key: string, item: T): number;
-    get(key: string): Array<T>;
-    exists(key: string): boolean;
-}
 /**
  * A Hashtable that contains a flat list of entries (bucket) for a given key.
  */
-export declare class BucketHash<T> implements IBucketHash<T> {
+export declare class BucketHash<T> {
     private dict;
     /**
      * To prevent collisions with reserved JavaScript propertie of Object, we prefix every key
@@ -25,7 +19,7 @@ export declare class BucketHash<T> implements IBucketHash<T> {
     add(key: string, item: T): number;
     /**
      * Returns the bucket of a given key.
-     * @param  {string}   key
+     * @param  {string}       key
      * @return {Array<T>}     The bucket or an empty Array
      */
     get(key: string): Array<T>;
@@ -48,7 +42,7 @@ export declare class BucketHash<T> implements IBucketHash<T> {
     clear(key: string): void;
     /**
      * Removes an element from the bucket at key. Will throw an exception if the element is not
-     * in the bucket. Will throw an exception if there is no bucket for this key.
+     * in the bucket.
      * @param  {string} key
      * @param  {T}      item
      * @return {number}      The number of items in the bucket AFTER the element has been removed.

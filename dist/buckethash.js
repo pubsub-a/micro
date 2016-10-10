@@ -13,7 +13,7 @@ var BucketHash = (function () {
     BucketHash.prototype.encodeKey = function (key) {
         // prevent using JS internal properties of Object by using a prefix
         // for all keys
-        return '%' + key;
+        return "%" + key;
     };
     BucketHash.prototype.decodeKey = function (key) {
         return key.substr(1);
@@ -39,7 +39,7 @@ var BucketHash = (function () {
     };
     /**
      * Returns the bucket of a given key.
-     * @param  {string}   key
+     * @param  {string}       key
      * @return {Array<T>}     The bucket or an empty Array
      */
     BucketHash.prototype.get = function (key) {
@@ -81,7 +81,7 @@ var BucketHash = (function () {
     };
     /**
      * Removes an element from the bucket at key. Will throw an exception if the element is not
-     * in the bucket. Will throw an exception if there is no bucket for this key.
+     * in the bucket.
      * @param  {string} key
      * @param  {T}      item
      * @return {number}      The number of items in the bucket AFTER the element has been removed.

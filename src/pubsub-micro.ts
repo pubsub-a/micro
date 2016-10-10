@@ -12,7 +12,7 @@ import {
 } from 'pubsub-a-interfaces';
 
 import { Promise } from "es6-promise";
-import { BucketHash, IBucketHash } from './buckethash';
+import { BucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import Util from './util';
@@ -58,9 +58,9 @@ class Publisher<T> implements InternalInterfaces.IPublisher<T> {
 
     encodedTopic: string;
 
-    private bucket: IBucketHash<IObserverFunc<any>>;
+    private bucket: BucketHash<IObserverFunc<any>>;
 
-    constructor(encodedTopic: string, bucket: IBucketHash<IObserverFunc<any>>) {
+    constructor(encodedTopic: string, bucket: BucketHash<IObserverFunc<any>>) {
         this.encodedTopic = encodedTopic;
         this.bucket = bucket;
     }
@@ -80,7 +80,7 @@ class Publisher<T> implements InternalInterfaces.IPublisher<T> {
 
 class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
 
-    constructor(public encodedTopic: string, private bucket: IBucketHash<IObserverFunc<T>>) {
+    constructor(public encodedTopic: string, private bucket: BucketHash<IObserverFunc<T>>) {
     }
 
     subscribe(observer: IObserverFunc<T>): ISubscriptionToken {
