@@ -1,5 +1,4 @@
 import { ISubscriptionToken, ISubscriptionDisposedCallback } from 'pubsub-a-interfaces';
-import { Promise } from "es6-promise";
 export interface IDisposeFunction {
     (callback?: ISubscriptionDisposedCallback): Promise<number>;
 }

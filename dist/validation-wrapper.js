@@ -1,5 +1,4 @@
 "use strict";
-var es6_promise_1 = require("es6-promise");
 var string_validation_1 = require("./string-validation");
 var helper_1 = require("./helper");
 /**
@@ -22,7 +21,7 @@ var PubSubValidationWrapper = (function () {
         if (this.isStopped) {
             var err = "Already stopped, can't restart. You need to create a new instance";
             helper_1.invokeIfDefined(callback, this, err);
-            return es6_promise_1.Promise.reject("Already stopped, can't restart. You need to create a new instance");
+            return Promise.reject("Already stopped, can't restart. You need to create a new instance");
         }
         return this.pubsub.start(callback, onStopByExternal);
     };
@@ -34,7 +33,7 @@ var PubSubValidationWrapper = (function () {
         var _this = this;
         if (this.isStopped) {
             var err = "Instance is stopped";
-            return es6_promise_1.Promise.reject(new Error(err));
+            return Promise.reject(new Error(err));
         }
         if (typeof name !== 'string')
             throw new Error("Channel name must be of type string");
@@ -50,7 +49,7 @@ var PubSubValidationWrapper = (function () {
             };
         }
         // TODO promise chaining
-        return new es6_promise_1.Promise(function (resolve, reject) {
+        return new Promise(function (resolve, reject) {
             _this.pubsub.channel(name, wrappedCallback).then(function (chan) {
                 var channel = new ChannelValidated(name, chan, _this);
                 resolve(channel);
@@ -98,7 +97,7 @@ var ChannelValidated = (function () {
         if (this.pubsub.isStopped) {
             var err = new Error("pubsub has stopped");
             helper_1.invokeIfDefined(callback, err);
-            return es6_promise_1.Promise.reject(err);
+            return Promise.reject(err);
         }
         this.stringValidator.validateTopicName(topic);
         return this.wrappedChannel.publish(topic, payload, callback);
@@ -110,7 +109,7 @@ var ChannelValidated = (function () {
         if (this.pubsub.isStopped) {
             var err = new Error("pubsub has stoped");
             helper_1.invokeIfDefined(callback, undefined, undefined, err);
-            return es6_promise_1.Promise.reject(err);
+            return Promise.reject(err);
         }
         return this.wrappedChannel.subscribe(topic, observer, callback);
     };

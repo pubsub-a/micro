@@ -1,5 +1,4 @@
 import { IPubSub, IChannel, IObserverFunc, IPubSubStartCallback, IPubSubStopCallback, IChannelReadyCallback } from 'pubsub-a-interfaces';
-import { Promise } from "es6-promise";
 import { BucketHash } from './buckethash';
 import { PubSubValidationWrapper } from "./validation-wrapper";
 export declare class PubSubMicroValidated extends PubSubValidationWrapper {

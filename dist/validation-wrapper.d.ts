@@ -1,5 +1,4 @@
 import { IPubSub, IChannel, IPubSubStartCallback, IPubSubStopCallback, IChannelReadyCallback } from 'pubsub-a-interfaces';
-import { Promise } from "es6-promise";
 import { TopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string-validation";
 /**
  * Takes an IPubSub and wrapps it, additionally checking

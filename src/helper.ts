@@ -1,5 +1,4 @@
 import { ISubscriptionToken } from "pubsub-a-interfaces";
-import { Promise } from "es6-promise";
 
 export function safeDispose(token: ISubscriptionToken): Promise<number | undefined> {
     if (!token)

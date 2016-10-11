@@ -11,7 +11,6 @@ import {
     ISubscriptionRegisteredCallback
 } from 'pubsub-a-interfaces';
 
-import { Promise } from "es6-promise";
 import { PubSubMicroUnvalidated } from "./pubsub-micro";
 import { TopicChannelNameValidator, DefaultTopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string-validation";
 import { invokeIfDefined } from "./helper";

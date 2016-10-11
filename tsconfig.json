@@ -5,7 +5,8 @@
         "declaration": true,
         "sourceMap": true,
         "module": "commonjs",
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "lib": [ "es5", "es2015.promise" ]
     },
     "include": [
         "src/*.ts"

@@ -11,7 +11,6 @@ import {
     ISubscriptionRegisteredCallback
 } from 'pubsub-a-interfaces';
 
-import { Promise } from "es6-promise";
 import { BucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
