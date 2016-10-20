@@ -67,6 +67,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.SubscriptionToken = subscription_token_1.SubscriptionToken;
 	var validation_wrapper_1 = __webpack_require__(4);
 	exports.PubSubValidationWrapper = validation_wrapper_1.PubSubValidationWrapper;
+	var util_1 = __webpack_require__(7);
+	exports.randomString = util_1.randomString;
 	__export(__webpack_require__(5));
 	var helper_1 = __webpack_require__(6);
 	exports.invokeIfDefined = helper_1.invokeIfDefined;
@@ -588,6 +590,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	exports.invokeIfDefined = invokeIfDefined;
 	//# sourceMappingURL=helper.js.map
+
+/***/ },
+/* 7 */
+/***/ function(module, exports) {
+
+	"use strict";
+	function randomString(length) {
+	    if (length === void 0) { length = 8; }
+	    var text = '';
+	    var allowedCharacters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	    for (var i = 0; i < length; i++)
+	        text += allowedCharacters.charAt(Math.floor(Math.random() * allowedCharacters.length));
+	    return text;
+	}
+	exports.randomString = randomString;
+	//# sourceMappingURL=util.js.map
 
 /***/ }
 /******/ ])

@@ -14,7 +14,6 @@ import {
 import { BucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
-import Util from './util';
 import { PubSubValidationWrapper } from "./validation-wrapper";
 import { invokeIfDefined, safeDispose } from "./helper";
 

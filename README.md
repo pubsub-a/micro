@@ -61,9 +61,4 @@ pubsub.start()
 
 See the [PubSub/A interface definition][pubsub-interfaces] for in-depth syntax overview.
 
-License
--------
-This reference implementation is licensed under the MIT license.
-
-
   [pubsub-interfaces]: https://github.com/pubsub-a/pubsub-interfaces

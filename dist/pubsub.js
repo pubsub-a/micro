@@ -11,6 +11,8 @@ var subscription_token_1 = require("./subscription-token");
 exports.SubscriptionToken = subscription_token_1.SubscriptionToken;
 var validation_wrapper_1 = require("./validation-wrapper");
 exports.PubSubValidationWrapper = validation_wrapper_1.PubSubValidationWrapper;
+var util_1 = require("./util");
+exports.randomString = util_1.randomString;
 __export(require("./string-validation"));
 var helper_1 = require("./helper");
 exports.invokeIfDefined = helper_1.invokeIfDefined;

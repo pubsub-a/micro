@@ -1,3 +1,1 @@
-export default class Util {
-    static randomString(length?: number): string;
-}
+export declare function randomString(length?: number): string;
