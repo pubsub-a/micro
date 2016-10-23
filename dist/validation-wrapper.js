@@ -14,6 +14,13 @@ var PubSubValidationWrapper = (function () {
         this.pubsub = wrappedPubSub;
         this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator();
     }
+    Object.defineProperty(PubSubValidationWrapper.prototype, "clientId", {
+        get: function () {
+            return this.pubsub.clientId;
+        },
+        enumerable: true,
+        configurable: true
+    });
     PubSubValidationWrapper.prototype.setTopicChannelNameSettings = function (settings) {
         this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator(settings);
     };

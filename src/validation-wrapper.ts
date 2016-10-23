@@ -31,6 +31,10 @@ export class PubSubValidationWrapper implements IPubSub
 
     public isStopped = false;
 
+    public get clientId(): string {
+        return this.pubsub.clientId;
+    }
+
     constructor(wrappedPubSub: IPubSub) {
         this.pubsub = wrappedPubSub;
         this.stringValidator = new DefaultTopicChannelNameValidator();

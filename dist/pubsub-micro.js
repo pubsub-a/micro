@@ -19,6 +19,7 @@ exports.PubSubMicroValidated = PubSubMicroValidated;
 var PubSubMicroUnvalidated = (function () {
     function PubSubMicroUnvalidated() {
         this.isStopped = false;
+        this.clientId = "";
         this.subscriptionCache = new buckethash_1.BucketHash();
     }
     PubSubMicroUnvalidated.prototype.start = function (callback, disconnect) {

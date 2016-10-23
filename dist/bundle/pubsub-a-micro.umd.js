@@ -235,6 +235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var PubSubMicroUnvalidated = (function () {
 	    function PubSubMicroUnvalidated() {
 	        this.isStopped = false;
+	        this.clientId = "";
 	        this.subscriptionCache = new buckethash_1.BucketHash();
 	    }
 	    PubSubMicroUnvalidated.prototype.start = function (callback, disconnect) {
@@ -391,6 +392,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.pubsub = wrappedPubSub;
 	        this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator();
 	    }
+	    Object.defineProperty(PubSubValidationWrapper.prototype, "clientId", {
+	        get: function () {
+	            return this.pubsub.clientId;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    PubSubValidationWrapper.prototype.setTopicChannelNameSettings = function (settings) {
 	        this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator(settings);
 	    };
