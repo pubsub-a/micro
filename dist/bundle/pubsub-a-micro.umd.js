@@ -227,7 +227,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var PubSubMicroValidated = (function (_super) {
 	    __extends(PubSubMicroValidated, _super);
 	    function PubSubMicroValidated() {
-	        _super.call(this, new PubSubMicroUnvalidated());
+	        return _super.call(this, new PubSubMicroUnvalidated()) || this;
 	    }
 	    return PubSubMicroValidated;
 	}(validation_wrapper_1.PubSubValidationWrapper));

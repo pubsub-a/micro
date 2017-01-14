@@ -4,14 +4,14 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var buckethash_1 = require('./buckethash');
-var subscription_token_1 = require('./subscription-token');
+var buckethash_1 = require("./buckethash");
+var subscription_token_1 = require("./subscription-token");
 var validation_wrapper_1 = require("./validation-wrapper");
 var helper_1 = require("./helper");
 var PubSubMicroValidated = (function (_super) {
     __extends(PubSubMicroValidated, _super);
     function PubSubMicroValidated() {
-        _super.call(this, new PubSubMicroUnvalidated());
+        return _super.call(this, new PubSubMicroUnvalidated()) || this;
     }
     return PubSubMicroValidated;
 }(validation_wrapper_1.PubSubValidationWrapper));
