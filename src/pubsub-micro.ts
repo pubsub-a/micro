@@ -28,6 +28,7 @@ export class PubSubMicroUnvalidated implements IPubSub {
     public readonly subscriptionCache: BucketHash<IObserverFunc<any>>;
 
     public isStopped = false;
+    public isStarted = false;
 
     public clientId: string = "";
 

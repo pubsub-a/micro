@@ -235,6 +235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var PubSubMicroUnvalidated = (function () {
 	    function PubSubMicroUnvalidated() {
 	        this.isStopped = false;
+	        this.isStarted = false;
 	        this.clientId = "";
 	        this.subscriptionCache = new buckethash_1.BucketHash();
 	    }
@@ -389,6 +390,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function PubSubValidationWrapper(wrappedPubSub) {
 	        this.enablePlainObjectCheck = true;
 	        this.isStopped = false;
+	        this.isStarted = false;
 	        this.pubsub = wrappedPubSub;
 	        this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator();
 	    }
@@ -407,6 +409,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var err = "Already stopped, can't restart. You need to create a new instance";
 	            helper_1.invokeIfDefined(callback, this, err);
 	            return Promise.reject("Already stopped, can't restart. You need to create a new instance");
+	        }
+	        if (this.isStarted == true) {
+	            var err = "Already started, can't start a second time.";
+	            throw new Error(err);
+	        }
+	        else {
+	            this.isStarted = true;
 	        }
 	        return this.pubsub.start(callback, onStopByExternal);
 	    };

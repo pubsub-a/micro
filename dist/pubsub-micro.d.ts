@@ -7,6 +7,7 @@ export declare class PubSubMicroValidated extends PubSubValidationWrapper {
 export declare class PubSubMicroUnvalidated implements IPubSub {
     readonly subscriptionCache: BucketHash<IObserverFunc<any>>;
     isStopped: boolean;
+    isStarted: boolean;
     clientId: string;
     constructor();
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub>;

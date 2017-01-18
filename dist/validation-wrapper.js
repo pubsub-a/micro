@@ -11,6 +11,7 @@ var PubSubValidationWrapper = (function () {
     function PubSubValidationWrapper(wrappedPubSub) {
         this.enablePlainObjectCheck = true;
         this.isStopped = false;
+        this.isStarted = false;
         this.pubsub = wrappedPubSub;
         this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator();
     }
@@ -29,6 +30,13 @@ var PubSubValidationWrapper = (function () {
             var err = "Already stopped, can't restart. You need to create a new instance";
             helper_1.invokeIfDefined(callback, this, err);
             return Promise.reject("Already stopped, can't restart. You need to create a new instance");
+        }
+        if (this.isStarted == true) {
+            var err = "Already started, can't start a second time.";
+            throw new Error(err);
+        }
+        else {
+            this.isStarted = true;
         }
         return this.pubsub.start(callback, onStopByExternal);
     };

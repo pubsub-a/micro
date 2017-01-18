@@ -30,6 +30,7 @@ export class PubSubValidationWrapper implements IPubSub
     public enablePlainObjectCheck = true;
 
     public isStopped = false;
+    public isStarted = false;
 
     public get clientId(): string {
         return this.pubsub.clientId;
@@ -46,10 +47,18 @@ export class PubSubValidationWrapper implements IPubSub
 
     start(callback?: IPubSubStartCallback, onStopByExternal?: Function): Promise<IPubSub> {
         if (this.isStopped) {
-            let err = "Already stopped, can't restart. You need to create a new instance";
+            const err = "Already stopped, can't restart. You need to create a new instance";
             invokeIfDefined(callback, this, err);
             return Promise.reject("Already stopped, can't restart. You need to create a new instance");
         }
+
+        if (this.isStarted == true) {
+            const err = "Already started, can't start a second time.";
+            throw new Error(err);
+        } else {
+            this.isStarted = true;
+        }
+
         return this.pubsub.start(callback, onStopByExternal);
     }
 
