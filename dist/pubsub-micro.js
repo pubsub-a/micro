@@ -10,18 +10,33 @@ var validation_wrapper_1 = require("./validation-wrapper");
 var helper_1 = require("./helper");
 var PubSubMicroValidated = (function (_super) {
     __extends(PubSubMicroValidated, _super);
-    function PubSubMicroValidated() {
-        return _super.call(this, new PubSubMicroUnvalidated()) || this;
+    function PubSubMicroValidated(subscriptionCache) {
+        return _super.call(this, new PubSubMicroUnvalidated(subscriptionCache)) || this;
     }
+    Object.defineProperty(PubSubMicroValidated.prototype, "subscriptionCache", {
+        /**
+         * To allow shared/link PubSub instances (for testing)
+         * expose the subscriptionCache so we can pass it to
+         * other instances
+         */
+        get: function () {
+            return this.pubsub.subscriptionCache;
+        },
+        enumerable: true,
+        configurable: true
+    });
     return PubSubMicroValidated;
 }(validation_wrapper_1.PubSubValidationWrapper));
 exports.PubSubMicroValidated = PubSubMicroValidated;
 var PubSubMicroUnvalidated = (function () {
-    function PubSubMicroUnvalidated() {
+    function PubSubMicroUnvalidated(subscriptionCache) {
         this.isStopped = false;
         this.isStarted = false;
         this.clientId = "";
-        this.subscriptionCache = new buckethash_1.BucketHash();
+        if (subscriptionCache === undefined)
+            this.subscriptionCache = new buckethash_1.BucketHash();
+        else
+            this.subscriptionCache = subscriptionCache;
     }
     PubSubMicroUnvalidated.prototype.start = function (callback, disconnect) {
         helper_1.invokeIfDefined(callback, this, undefined, undefined);

@@ -20,12 +20,13 @@
     var getLinkedPubSubImplementation = function(numInstances) {
         if (!numInstances) numInstances = 2;
         var instance = new PubSub();
+        var sharedSubscriptionCache = instance.subscriptionCache;
 
         var instances = [];
 
         while(numInstances-- > 0) {
             // PubSubMicro is object instance based, always return the same object instance
-            instances.push(instance);
+            instances.push(new PubSub(sharedSubscriptionCache));
         }
         return instances;
     };

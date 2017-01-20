@@ -17,23 +17,38 @@ import { SubscriptionToken } from './subscription-token';
 import { PubSubValidationWrapper } from "./validation-wrapper";
 import { invokeIfDefined, safeDispose } from "./helper";
 
+export type SubscriptionCache = BucketHash<IObserverFunc<any>>;
+
 export class PubSubMicroValidated extends PubSubValidationWrapper {
-    constructor() {
-        super(new PubSubMicroUnvalidated());
+
+    /**
+     * To allow shared/link PubSub instances (for testing)
+     * expose the subscriptionCache so we can pass it to
+     * other instances
+     */
+    public get subscriptionCache() {
+        return (this.pubsub as PubSubMicroUnvalidated).subscriptionCache as SubscriptionCache;
+    }
+
+    constructor(subscriptionCache?: SubscriptionCache) {
+        super(new PubSubMicroUnvalidated(subscriptionCache));
     }
 }
 
 export class PubSubMicroUnvalidated implements IPubSub {
 
-    public readonly subscriptionCache: BucketHash<IObserverFunc<any>>;
+    public readonly subscriptionCache: SubscriptionCache
 
     public isStopped = false;
     public isStarted = false;
 
     public clientId: string = "";
 
-    constructor() {
-        this.subscriptionCache = new BucketHash<IObserverFunc<any>>();
+    constructor(subscriptionCache?: SubscriptionCache) {
+        if (subscriptionCache === undefined)
+            this.subscriptionCache = new BucketHash<IObserverFunc<any>>();
+        else
+            this.subscriptionCache = subscriptionCache;
     }
 
     start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
@@ -59,9 +74,9 @@ class Publisher<T> implements InternalInterfaces.IPublisher<T> {
 
     encodedTopic: string;
 
-    private bucket: BucketHash<IObserverFunc<any>>;
+    private bucket: SubscriptionCache
 
-    constructor(encodedTopic: string, bucket: BucketHash<IObserverFunc<any>>) {
+    constructor(encodedTopic: string, bucket: SubscriptionCache) {
         this.encodedTopic = encodedTopic;
         this.bucket = bucket;
     }
@@ -81,7 +96,7 @@ class Publisher<T> implements InternalInterfaces.IPublisher<T> {
 
 class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
 
-    constructor(public encodedTopic: string, private bucket: BucketHash<IObserverFunc<T>>) {
+    constructor(public encodedTopic: string, private bucket: SubscriptionCache) {
     }
 
     subscribe(observer: IObserverFunc<T>): ISubscriptionToken {
