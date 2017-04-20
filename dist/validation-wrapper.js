@@ -1,6 +1,5 @@
 "use strict";
 var string_validation_1 = require("./string-validation");
-var helper_1 = require("./helper");
 /**
  * Takes an IPubSub and wrapps it, additionally checking
  * - any channel and topic string names for validity
@@ -25,11 +24,10 @@ var PubSubValidationWrapper = (function () {
     PubSubValidationWrapper.prototype.setTopicChannelNameSettings = function (settings) {
         this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator(settings);
     };
-    PubSubValidationWrapper.prototype.start = function (callback, onStopByExternal) {
+    PubSubValidationWrapper.prototype.start = function (onStopByExternal) {
         if (this.isStopped) {
             var err = "Already stopped, can't restart. You need to create a new instance";
-            helper_1.invokeIfDefined(callback, this, err);
-            return Promise.reject("Already stopped, can't restart. You need to create a new instance");
+            return Promise.reject(err);
         }
         if (this.isStarted == true) {
             var err = "Already started, can't start a second time.";
@@ -38,13 +36,13 @@ var PubSubValidationWrapper = (function () {
         else {
             this.isStarted = true;
         }
-        return this.pubsub.start(callback, onStopByExternal);
+        return this.pubsub.start(onStopByExternal);
     };
-    PubSubValidationWrapper.prototype.stop = function (callback) {
+    PubSubValidationWrapper.prototype.stop = function () {
         this.isStopped = true;
-        return this.pubsub.stop(callback);
+        return this.pubsub.stop();
     };
-    PubSubValidationWrapper.prototype.channel = function (name, callback) {
+    PubSubValidationWrapper.prototype.channel = function (name) {
         var _this = this;
         if (this.isStopped) {
             var err = "Instance is stopped";
@@ -56,20 +54,8 @@ var PubSubValidationWrapper = (function () {
             throw new Error("Channel name must be non-zerolength string");
         this.stringValidator.validateChannelName(name);
         // VALIDATION PASSED...
-        var wrappedCallback;
-        if (callback) {
-            wrappedCallback = function (chan) {
-                var wrappedChannel = new ChannelValidated(name, chan, _this);
-                callback(wrappedChannel);
-            };
-        }
-        // TODO promise chaining
-        return new Promise(function (resolve, reject) {
-            _this.pubsub.channel(name, wrappedCallback).then(function (chan) {
-                var channel = new ChannelValidated(name, chan, _this);
-                resolve(channel);
-            });
-            // TODO reject() case
+        return this.pubsub.channel(name).then(function (chan) {
+            return new ChannelValidated(name, chan, _this);
         });
     };
     return PubSubValidationWrapper;
@@ -102,7 +88,7 @@ var ChannelValidated = (function () {
             return true;
         }
     };
-    ChannelValidated.prototype.publish = function (topic, payload, callback) {
+    ChannelValidated.prototype.publish = function (topic, payload) {
         if (typeof topic !== 'string' || topic == "")
             throw new Error("topic must be a non-zerolength string, was: " + topic);
         if (this.enablePlainObjectCheck && !this.objectIsPlainObject(payload)) {
@@ -110,29 +96,27 @@ var ChannelValidated = (function () {
             throw err;
         }
         if (this.pubsub.isStopped) {
-            var err = new Error("pubsub has stopped");
-            helper_1.invokeIfDefined(callback, err);
+            var err = new Error("publish after pubsub instance has stopped");
             return Promise.reject(err);
         }
         this.stringValidator.validateTopicName(topic);
-        return this.wrappedChannel.publish(topic, payload, callback);
+        return this.wrappedChannel.publish(topic, payload);
     };
-    ChannelValidated.prototype.subscribe = function (topic, observer, callback) {
+    ChannelValidated.prototype.subscribe = function (topic, observer) {
         if (typeof topic !== 'string' || topic == "")
             throw new Error("topic must be a non-zerolength string, was: " + topic);
         this.stringValidator.validateTopicName(topic);
         if (this.pubsub.isStopped) {
-            var err = new Error("pubsub has stoped");
-            helper_1.invokeIfDefined(callback, undefined, undefined, err);
+            var err = new Error("subscribe after pubsub has stoped");
             return Promise.reject(err);
         }
-        return this.wrappedChannel.subscribe(topic, observer, callback);
+        return this.wrappedChannel.subscribe(topic, observer);
     };
-    ChannelValidated.prototype.once = function (topic, observer, callback) {
+    ChannelValidated.prototype.once = function (topic, observer) {
         if (typeof topic !== 'string' || topic == "")
             throw new Error("topic must be a non-zerolength string");
         this.stringValidator.validateTopicName(topic);
-        return this.wrappedChannel.once(topic, observer, callback);
+        return this.wrappedChannel.once(topic, observer);
     };
     return ChannelValidated;
 }());

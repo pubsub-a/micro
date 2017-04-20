@@ -1,4 +1,4 @@
-import { IPubSub, IChannel, IPubSubStartCallback, IPubSubStopCallback, IChannelReadyCallback } from 'pubsub-a-interfaces';
+import { IPubSub, IChannel } from 'pubsub-a-interfaces';
 import { TopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string-validation";
 /**
  * Takes an IPubSub and wrapps it, additionally checking
@@ -15,7 +15,7 @@ export declare class PubSubValidationWrapper implements IPubSub {
     readonly clientId: string;
     constructor(wrappedPubSub: IPubSub);
     setTopicChannelNameSettings(settings: DefaultTopicChannelNameValidatorSettings): void;
-    start(callback?: IPubSubStartCallback, onStopByExternal?: Function): Promise<IPubSub>;
-    stop(callback?: IPubSubStopCallback): Promise<void>;
-    channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel>;
+    start(onStopByExternal?: Function): Promise<IPubSub>;
+    stop(): Promise<void>;
+    channel(name: string): Promise<IChannel>;
 }

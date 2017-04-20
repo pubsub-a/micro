@@ -1,11 +1,11 @@
-import { ISubscriptionToken, ISubscriptionDisposedCallback } from 'pubsub-a-interfaces';
+import { ISubscriptionToken } from 'pubsub-a-interfaces';
 export interface IDisposeFunction {
-    (callback?: ISubscriptionDisposedCallback): Promise<number>;
+    (): Promise<number>;
 }
 export declare class SubscriptionToken implements ISubscriptionToken {
     isDisposed: boolean;
     count: number;
     private disposeFn;
     constructor(onDispose: IDisposeFunction, count?: number);
-    dispose(callback?: ISubscriptionDisposedCallback): Promise<number>;
+    dispose(): Promise<number>;
 }

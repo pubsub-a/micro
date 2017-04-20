@@ -1,4 +1,4 @@
-import { IPubSub, IChannel, IObserverFunc, IPubSubStartCallback, IPubSubStopCallback, IChannelReadyCallback } from 'pubsub-a-interfaces';
+import { IPubSub, IChannel, IObserverFunc } from 'pubsub-a-interfaces';
 import { BucketHash } from './buckethash';
 import { PubSubValidationWrapper } from "./validation-wrapper";
 export declare type SubscriptionCache = BucketHash<IObserverFunc<any>>;
@@ -17,7 +17,7 @@ export declare class PubSubMicroUnvalidated implements IPubSub {
     isStarted: boolean;
     clientId: string;
     constructor(subscriptionCache?: SubscriptionCache);
-    start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub>;
-    stop(callback?: IPubSubStopCallback): Promise<void>;
-    channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel>;
+    start(disconnect?: Function): Promise<IPubSub>;
+    stop(): Promise<void>;
+    channel(name: string): Promise<IChannel>;
 }

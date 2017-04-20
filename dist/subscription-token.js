@@ -5,12 +5,12 @@ var SubscriptionToken = (function () {
         this.disposeFn = onDispose;
         this.count = count ? count : 0;
     }
-    SubscriptionToken.prototype.dispose = function (callback) {
+    SubscriptionToken.prototype.dispose = function () {
         if (this.isDisposed) {
             throw new Error('Subscription is already disposed');
         }
         this.isDisposed = true;
-        return this.disposeFn(callback);
+        return this.disposeFn();
     };
     return SubscriptionToken;
 }());

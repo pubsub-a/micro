@@ -38,18 +38,15 @@ var PubSubMicroUnvalidated = (function () {
         else
             this.subscriptionCache = subscriptionCache;
     }
-    PubSubMicroUnvalidated.prototype.start = function (callback, disconnect) {
-        helper_1.invokeIfDefined(callback, this, undefined, undefined);
+    PubSubMicroUnvalidated.prototype.start = function (disconnect) {
         return Promise.resolve(this);
     };
-    PubSubMicroUnvalidated.prototype.stop = function (callback) {
+    PubSubMicroUnvalidated.prototype.stop = function () {
         this.isStopped = true;
-        helper_1.invokeIfDefined(callback);
         return Promise.resolve(void 0);
     };
-    PubSubMicroUnvalidated.prototype.channel = function (name, callback) {
+    PubSubMicroUnvalidated.prototype.channel = function (name) {
         var channel = new Channel(name, this);
-        helper_1.invokeIfDefined(callback, channel);
         return Promise.resolve(channel);
     };
     return PubSubMicroUnvalidated;
@@ -81,9 +78,8 @@ var Subscriber = (function () {
     Subscriber.prototype.subscribe = function (observer) {
         var _this = this;
         var number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
-        var onDispose = function (callback) {
+        var onDispose = function () {
             var remaining = _this.bucket.remove(_this.encodedTopic, observer);
-            helper_1.invokeIfDefined(callback, remaining);
             return Promise.resolve(remaining);
         };
         return new subscription_token_1.SubscriptionToken(onDispose, number_of_subscriptions);
@@ -120,16 +116,15 @@ var Channel = (function () {
         helper_1.invokeIfDefined(callback, topic, payload);
         return Promise.resolve();
     };
-    Channel.prototype.subscribe = function (topic, observer, callback) {
+    Channel.prototype.subscribe = function (topic, observer) {
         if (!observer) {
             throw new Error("observer function must be given and be of type function");
         }
         var subscriber = new Subscriber(this.encodeTopic(topic), this.bucket);
         var subscription = subscriber.subscribe(observer);
-        helper_1.invokeIfDefined(callback, subscription, topic, observer);
         return Promise.resolve(subscription);
     };
-    Channel.prototype.once = function (topic, observer, callback) {
+    Channel.prototype.once = function (topic, observer) {
         var promise;
         var alreadyRun = false;
         var subscribeAndDispose = (function (payload) {
@@ -142,7 +137,7 @@ var Channel = (function () {
             });
             observer(payload);
         }).bind(observer);
-        promise = this.subscribe(topic, subscribeAndDispose, callback);
+        promise = this.subscribe(topic, subscribeAndDispose);
         return promise;
     };
     return Channel;
