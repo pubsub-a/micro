@@ -1,7 +1,7 @@
-import { ISubscriptionToken, ISubscriptionDisposedCallback } from 'pubsub-a-interfaces';
+import { ISubscriptionToken } from 'pubsub-a-interfaces';
 
 export interface IDisposeFunction {
-    (callback?: ISubscriptionDisposedCallback): Promise<number>;
+    (): Promise<number>;
 }
 
 export class SubscriptionToken implements ISubscriptionToken {
@@ -16,12 +16,12 @@ export class SubscriptionToken implements ISubscriptionToken {
         this.count = count ? count : 0;
     }
 
-    dispose(callback?: ISubscriptionDisposedCallback): Promise<number> {
+    dispose(): Promise<number> {
         if (this.isDisposed) {
             throw new Error('Subscription is already disposed');
         }
 
         this.isDisposed = true;
-        return this.disposeFn(callback);
+        return this.disposeFn();
     }
 }

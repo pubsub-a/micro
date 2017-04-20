@@ -1,14 +1,8 @@
 import {
     IPubSub,
     IChannel,
-    IPublishReceivedCallback,
     ISubscriptionToken,
     IObserverFunc,
-    IPubSubStartCallback,
-    IPubSubStopCallback,
-    IChannelReadyCallback,
-    ISubscriptionDisposedCallback,
-    ISubscriptionRegisteredCallback
 } from 'pubsub-a-interfaces';
 
 import { BucketHash } from './buckethash';
@@ -51,23 +45,19 @@ export class PubSubMicroUnvalidated implements IPubSub {
             this.subscriptionCache = subscriptionCache;
     }
 
-    start(callback?: IPubSubStartCallback, disconnect?: Function): Promise<IPubSub> {
-        invokeIfDefined(callback, this, undefined, undefined);
+    start(disconnect?: Function): Promise<IPubSub> {
         return Promise.resolve(this);
     }
 
-    stop(callback?: IPubSubStopCallback): Promise<void> {
+    stop(): Promise<void> {
         this.isStopped = true;
-        invokeIfDefined(callback);
         return Promise.resolve(void 0);
     }
 
-    channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
-        var channel = new Channel(name, this);
-        invokeIfDefined(callback, channel);
+    channel(name: string): Promise<IChannel> {
+        const channel = new Channel(name, this);
         return Promise.resolve(channel);
     }
-
 }
 
 class Publisher<T> implements InternalInterfaces.IPublisher<T> {
@@ -102,9 +92,8 @@ class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
     subscribe(observer: IObserverFunc<T>): ISubscriptionToken {
         const number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
 
-        const onDispose = (callback?: ISubscriptionDisposedCallback) => {
-            var remaining = this.bucket.remove(this.encodedTopic, observer);
-            invokeIfDefined(callback, remaining);
+        const onDispose = () => {
+            const remaining = this.bucket.remove(this.encodedTopic, observer);
             return Promise.resolve(remaining);
         };
 
@@ -146,7 +135,7 @@ class Channel implements IChannel {
         return Promise.resolve();
     }
 
-    subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>)
+    subscribe<T>(topic: string, observer: IObserverFunc<T>)
         : Promise<ISubscriptionToken> {
 
         if (!observer) {
@@ -156,13 +145,11 @@ class Channel implements IChannel {
         const subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
         const subscription = subscriber.subscribe(observer);
 
-        invokeIfDefined(callback, subscription, topic, observer);
         return Promise.resolve(subscription);
     }
 
 
-    once<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>)
-        : Promise<ISubscriptionToken> {
+    once<T>(topic: string, observer: IObserverFunc<T>): Promise<ISubscriptionToken> {
 
         let promise: Promise<ISubscriptionToken>;
         let alreadyRun = false;
@@ -178,7 +165,7 @@ class Channel implements IChannel {
             observer(payload);
         }).bind(observer);
 
-        promise = this.subscribe<T>(topic, subscribeAndDispose, callback);
+        promise = this.subscribe<T>(topic, subscribeAndDispose);
         return promise;
     }
 

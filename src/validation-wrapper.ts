@@ -1,14 +1,8 @@
 import {
     IPubSub,
     IChannel,
-    IPublishReceivedCallback,
     ISubscriptionToken,
     IObserverFunc,
-    IPubSubStartCallback,
-    IPubSubStopCallback,
-    IChannelReadyCallback,
-    ISubscriptionDisposedCallback,
-    ISubscriptionRegisteredCallback
 } from 'pubsub-a-interfaces';
 
 import { PubSubMicroUnvalidated } from "./pubsub-micro";
@@ -45,11 +39,10 @@ export class PubSubValidationWrapper implements IPubSub
         this.stringValidator = new DefaultTopicChannelNameValidator(settings);
     }
 
-    start(callback?: IPubSubStartCallback, onStopByExternal?: Function): Promise<IPubSub> {
+    start(onStopByExternal?: Function): Promise<IPubSub> {
         if (this.isStopped) {
             const err = "Already stopped, can't restart. You need to create a new instance";
-            invokeIfDefined(callback, this, err);
-            return Promise.reject("Already stopped, can't restart. You need to create a new instance");
+            return Promise.reject(err);
         }
 
         if (this.isStarted == true) {
@@ -59,15 +52,15 @@ export class PubSubValidationWrapper implements IPubSub
             this.isStarted = true;
         }
 
-        return this.pubsub.start(callback, onStopByExternal);
+        return this.pubsub.start(onStopByExternal);
     }
 
-    stop(callback?: IPubSubStopCallback): Promise<void> {
+    stop(): Promise<void> {
         this.isStopped = true;
-        return this.pubsub.stop(callback);
+        return this.pubsub.stop();
     }
 
-    channel(name: string, callback?: IChannelReadyCallback): Promise<IChannel> {
+    channel(name: string): Promise<IChannel> {
         if (this.isStopped) {
             const err = "Instance is stopped";
             return Promise.reject(new Error(err));
@@ -82,20 +75,8 @@ export class PubSubValidationWrapper implements IPubSub
 
         // VALIDATION PASSED...
 
-        let wrappedCallback: IChannelReadyCallback;
-        if (callback) {
-            wrappedCallback = (chan: IChannel) => {
-                const wrappedChannel = new ChannelValidated(name, chan, this);
-                callback(wrappedChannel);
-            };
-        }
-        // TODO promise chaining
-        return new Promise((resolve, reject) => {
-            this.pubsub.channel(name, wrappedCallback).then(chan => {
-                const channel = new ChannelValidated(name, chan, this);
-                resolve(channel);
-            })
-            // TODO reject() case
+        return this.pubsub.channel(name).then(chan => {
+            return new ChannelValidated(name, chan, this);
         });
     }
 }
@@ -133,7 +114,7 @@ class ChannelValidated implements IChannel {
         }
     }
 
-    publish<T>(topic: string, payload: T, callback?: IPublishReceivedCallback): Promise<any> {
+    publish<T>(topic: string, payload: T): Promise<any> {
         if (typeof topic !== 'string' || topic == "")
             throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
 
@@ -144,34 +125,32 @@ class ChannelValidated implements IChannel {
 
         if (this.pubsub.isStopped) {
             const err = new Error("publish after pubsub instance has stopped");
-            invokeIfDefined(callback, err);
             return Promise.reject(err);
         }
 
         this.stringValidator.validateTopicName(topic);
 
-        return this.wrappedChannel.publish<T>(topic, payload, callback);
+        return this.wrappedChannel.publish<T>(topic, payload);
     }
 
-    subscribe<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>): Promise<ISubscriptionToken> {
+    subscribe<T>(topic: string, observer: IObserverFunc<T>): Promise<ISubscriptionToken> {
         if (typeof topic !== 'string' || topic == "")
             throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
         this.stringValidator.validateTopicName(topic);
 
         if (this.pubsub.isStopped) {
             const err = new Error("subscribe after pubsub has stoped");
-            invokeIfDefined(callback, undefined, undefined, err);
             return Promise.reject(err);
         }
 
-        return this.wrappedChannel.subscribe<T>(topic, observer, callback);
+        return this.wrappedChannel.subscribe<T>(topic, observer);
     }
 
-    once<T>(topic: string, observer: IObserverFunc<T>, callback?: ISubscriptionRegisteredCallback<T>): Promise<ISubscriptionToken> {
+    once<T>(topic: string, observer: IObserverFunc<T>): Promise<ISubscriptionToken> {
         if (typeof topic !== 'string' || topic == "")
             throw new Error("topic must be a non-zerolength string")
         this.stringValidator.validateTopicName(topic);
 
-        return this.wrappedChannel.once<T>(topic, observer, callback);
+        return this.wrappedChannel.once<T>(topic, observer);
     }
 }
