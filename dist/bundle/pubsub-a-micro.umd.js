@@ -58,6 +58,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 	}
+	Object.defineProperty(exports, "__esModule", { value: true });
 	var buckethash_1 = __webpack_require__(1);
 	exports.BucketHash = buckethash_1.BucketHash;
 	var pubsub_micro_1 = __webpack_require__(2);
@@ -80,6 +81,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
 	/**
 	 * A Hashtable that contains a flat list of entries (bucket) for a given key.
 	 */
@@ -215,11 +217,17 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
-	var __extends = (this && this.__extends) || function (d, b) {
-	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-	    function __() { this.constructor = d; }
-	    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-	};
+	var __extends = (this && this.__extends) || (function () {
+	    var extendStatics = Object.setPrototypeOf ||
+	        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+	        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+	    return function (d, b) {
+	        extendStatics(d, b);
+	        function __() { this.constructor = d; }
+	        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+	    };
+	})();
+	Object.defineProperty(exports, "__esModule", { value: true });
 	var buckethash_1 = __webpack_require__(1);
 	var subscription_token_1 = __webpack_require__(3);
 	var validation_wrapper_1 = __webpack_require__(4);
@@ -281,6 +289,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                observer(obj);
 	            }
 	            catch (err) {
+	                // we don't handle exceptions the observer functions throws,
+	                // it is observer functions duty to catch errors and handle them
 	            }
 	        }
 	    };
@@ -365,6 +375,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
 	var SubscriptionToken = (function () {
 	    function SubscriptionToken(onDispose, count) {
 	        this.isDisposed = false;
@@ -388,6 +399,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
 	var string_validation_1 = __webpack_require__(5);
 	/**
 	 * Takes an IPubSub and wrapps it, additionally checking
@@ -516,6 +528,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
 	var DefaultTopicChannelNameValidator = (function () {
 	    function DefaultTopicChannelNameValidator(settings) {
 	        if (!settings) {
@@ -581,6 +594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
 	function safeDispose(token) {
 	    if (!token)
 	        throw new Error("token must be defined!");
@@ -607,6 +621,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	"use strict";
+	Object.defineProperty(exports, "__esModule", { value: true });
 	function randomString(length) {
 	    if (length === void 0) { length = 8; }
 	    var text = '';

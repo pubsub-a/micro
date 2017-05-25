@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function randomString(length) {
     if (length === void 0) { length = 8; }
     var text = '';

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * A Hashtable that contains a flat list of entries (bucket) for a given key.
  */

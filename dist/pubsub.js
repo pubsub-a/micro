@@ -2,6 +2,7 @@
 function __export(m) {
     for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
 }
+Object.defineProperty(exports, "__esModule", { value: true });
 var buckethash_1 = require("./buckethash");
 exports.BucketHash = buckethash_1.BucketHash;
 var pubsub_micro_1 = require("./pubsub-micro");

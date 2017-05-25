@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var string_validation_1 = require("./string-validation");
 /**
  * Takes an IPubSub and wrapps it, additionally checking

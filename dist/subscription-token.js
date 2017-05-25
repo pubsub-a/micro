@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var SubscriptionToken = (function () {
     function SubscriptionToken(onDispose, count) {
         this.isDisposed = false;

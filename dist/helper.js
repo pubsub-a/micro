@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function safeDispose(token) {
     if (!token)
         throw new Error("token must be defined!");
