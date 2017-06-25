@@ -15,7 +15,11 @@ export declare class PubSubMicroUnvalidated implements IPubSub {
     readonly subscriptionCache: SubscriptionCache;
     isStopped: boolean;
     isStarted: boolean;
+    onStart: Promise<void>;
+    onStop: Promise<void>;
     clientId: string;
+    private notifyStart;
+    private notifyStop;
     constructor(subscriptionCache?: SubscriptionCache);
     start(disconnect?: Function): Promise<IPubSub>;
     stop(): Promise<void>;

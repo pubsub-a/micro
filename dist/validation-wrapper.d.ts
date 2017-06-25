@@ -12,6 +12,8 @@ export declare class PubSubValidationWrapper implements IPubSub {
     enablePlainObjectCheck: boolean;
     isStopped: boolean;
     isStarted: boolean;
+    readonly onStart: Promise<void>;
+    readonly onStop: Promise<void>;
     readonly clientId: string;
     constructor(wrappedPubSub: IPubSub);
     setTopicChannelNameSettings(settings: DefaultTopicChannelNameValidatorSettings): void;

@@ -26,6 +26,13 @@ export class PubSubValidationWrapper implements IPubSub
     public isStopped = false;
     public isStarted = false;
 
+    public get onStart() {
+        return this.pubsub.onStart;
+    }
+    public get onStop() {
+        return this.pubsub.onStop;
+    }
+
     public get clientId(): string {
         return this.pubsub.clientId;
     }
@@ -83,13 +90,14 @@ export class PubSubValidationWrapper implements IPubSub
 
 class ChannelValidated implements IChannel {
 
+    public pubsub: PubSubValidationWrapper;
+
     protected wrappedChannel: IChannel;
 
     protected get stringValidator(): TopicChannelNameValidator {
         return this.pubsub.stringValidator;
     }
 
-    protected pubsub: PubSubValidationWrapper;
     protected enablePlainObjectCheck: boolean;
 
     public name: string;

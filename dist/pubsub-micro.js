@@ -36,6 +36,7 @@ var PubSubMicroValidated = (function (_super) {
 exports.PubSubMicroValidated = PubSubMicroValidated;
 var PubSubMicroUnvalidated = (function () {
     function PubSubMicroUnvalidated(subscriptionCache) {
+        var _this = this;
         this.isStopped = false;
         this.isStarted = false;
         this.clientId = "";
@@ -43,11 +44,19 @@ var PubSubMicroUnvalidated = (function () {
             this.subscriptionCache = new buckethash_1.BucketHash();
         else
             this.subscriptionCache = subscriptionCache;
+        this.onStart = new Promise(function (resolve, reject) {
+            _this.notifyStart = function () { return resolve(); };
+        });
+        this.onStop = new Promise(function (resolve, reject) {
+            _this.notifyStop = function () { return resolve(); };
+        });
     }
     PubSubMicroUnvalidated.prototype.start = function (disconnect) {
+        this.notifyStart();
         return Promise.resolve(this);
     };
     PubSubMicroUnvalidated.prototype.stop = function () {
+        this.notifyStop();
         this.isStopped = true;
         return Promise.resolve(void 0);
     };

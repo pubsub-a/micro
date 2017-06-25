@@ -15,6 +15,20 @@ var PubSubValidationWrapper = (function () {
         this.pubsub = wrappedPubSub;
         this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator();
     }
+    Object.defineProperty(PubSubValidationWrapper.prototype, "onStart", {
+        get: function () {
+            return this.pubsub.onStart;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(PubSubValidationWrapper.prototype, "onStop", {
+        get: function () {
+            return this.pubsub.onStop;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(PubSubValidationWrapper.prototype, "clientId", {
         get: function () {
             return this.pubsub.clientId;
@@ -97,7 +111,7 @@ var ChannelValidated = (function () {
             throw err;
         }
         if (this.pubsub.isStopped) {
-            var err = new Error("publish after pubsub instance has stopped");
+            var err = new Error("publish after pubsub instance has stopped, encountered when publishing on topic: " + topic);
             return Promise.reject(err);
         }
         this.stringValidator.validateTopicName(topic);
@@ -108,7 +122,7 @@ var ChannelValidated = (function () {
             throw new Error("topic must be a non-zerolength string, was: " + topic);
         this.stringValidator.validateTopicName(topic);
         if (this.pubsub.isStopped) {
-            var err = new Error("subscribe after pubsub has stoped");
+            var err = new Error("subscribe after pubsub instance has stopped, topic was: " + topic);
             return Promise.reject(err);
         }
         return this.wrappedChannel.subscribe(topic, observer);

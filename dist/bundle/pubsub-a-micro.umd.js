@@ -52,7 +52,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	function __export(m) {
@@ -76,9 +76,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.safeDispose = helper_1.safeDispose;
 	//# sourceMappingURL=pubsub.js.map
 
-/***/ },
+/***/ }),
 /* 1 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -212,9 +212,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.BucketHash = BucketHash;
 	//# sourceMappingURL=buckethash.js.map
 
-/***/ },
+/***/ }),
 /* 2 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	var __extends = (this && this.__extends) || (function () {
@@ -254,6 +254,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.PubSubMicroValidated = PubSubMicroValidated;
 	var PubSubMicroUnvalidated = (function () {
 	    function PubSubMicroUnvalidated(subscriptionCache) {
+	        var _this = this;
 	        this.isStopped = false;
 	        this.isStarted = false;
 	        this.clientId = "";
@@ -261,11 +262,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.subscriptionCache = new buckethash_1.BucketHash();
 	        else
 	            this.subscriptionCache = subscriptionCache;
+	        this.onStart = new Promise(function (resolve, reject) {
+	            _this.notifyStart = function () { return resolve(); };
+	        });
+	        this.onStop = new Promise(function (resolve, reject) {
+	            _this.notifyStop = function () { return resolve(); };
+	        });
 	    }
 	    PubSubMicroUnvalidated.prototype.start = function (disconnect) {
+	        this.notifyStart();
 	        return Promise.resolve(this);
 	    };
 	    PubSubMicroUnvalidated.prototype.stop = function () {
+	        this.notifyStop();
 	        this.isStopped = true;
 	        return Promise.resolve(void 0);
 	    };
@@ -370,9 +379,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}());
 	//# sourceMappingURL=pubsub-micro.js.map
 
-/***/ },
+/***/ }),
 /* 3 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -394,9 +403,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.SubscriptionToken = SubscriptionToken;
 	//# sourceMappingURL=subscription-token.js.map
 
-/***/ },
+/***/ }),
 /* 4 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -415,6 +424,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.pubsub = wrappedPubSub;
 	        this.stringValidator = new string_validation_1.DefaultTopicChannelNameValidator();
 	    }
+	    Object.defineProperty(PubSubValidationWrapper.prototype, "onStart", {
+	        get: function () {
+	            return this.pubsub.onStart;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
+	    Object.defineProperty(PubSubValidationWrapper.prototype, "onStop", {
+	        get: function () {
+	            return this.pubsub.onStop;
+	        },
+	        enumerable: true,
+	        configurable: true
+	    });
 	    Object.defineProperty(PubSubValidationWrapper.prototype, "clientId", {
 	        get: function () {
 	            return this.pubsub.clientId;
@@ -497,7 +520,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw err;
 	        }
 	        if (this.pubsub.isStopped) {
-	            var err = new Error("publish after pubsub instance has stopped");
+	            var err = new Error("publish after pubsub instance has stopped, encountered when publishing on topic: " + topic);
 	            return Promise.reject(err);
 	        }
 	        this.stringValidator.validateTopicName(topic);
@@ -508,7 +531,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            throw new Error("topic must be a non-zerolength string, was: " + topic);
 	        this.stringValidator.validateTopicName(topic);
 	        if (this.pubsub.isStopped) {
-	            var err = new Error("subscribe after pubsub has stoped");
+	            var err = new Error("subscribe after pubsub instance has stopped, topic was: " + topic);
 	            return Promise.reject(err);
 	        }
 	        return this.wrappedChannel.subscribe(topic, observer);
@@ -523,9 +546,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	}());
 	//# sourceMappingURL=validation-wrapper.js.map
 
-/***/ },
+/***/ }),
 /* 5 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -589,9 +612,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.DefaultTopicChannelNameValidator = DefaultTopicChannelNameValidator;
 	//# sourceMappingURL=string-validation.js.map
 
-/***/ },
+/***/ }),
 /* 6 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -616,9 +639,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.invokeIfDefined = invokeIfDefined;
 	//# sourceMappingURL=helper.js.map
 
-/***/ },
+/***/ }),
 /* 7 */
-/***/ function(module, exports) {
+/***/ (function(module, exports) {
 
 	"use strict";
 	Object.defineProperty(exports, "__esModule", { value: true });
@@ -633,7 +656,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.randomString = randomString;
 	//# sourceMappingURL=util.js.map
 
-/***/ }
+/***/ })
 /******/ ])
 });
 ;

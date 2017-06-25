@@ -36,20 +36,36 @@ export class PubSubMicroUnvalidated implements IPubSub {
     public isStopped = false;
     public isStarted = false;
 
+    public onStart: Promise<void>;
+    public onStop: Promise<void>;
+
     public clientId: string = "";
+
+    private notifyStart: () => void;
+    private notifyStop: () => void;
 
     constructor(subscriptionCache?: SubscriptionCache) {
         if (subscriptionCache === undefined)
             this.subscriptionCache = new BucketHash<IObserverFunc<any>>();
         else
             this.subscriptionCache = subscriptionCache;
+
+        this.onStart = new Promise<void>((resolve, reject) => {
+            this.notifyStart = () => resolve();
+        })
+
+        this.onStop = new Promise<void>((resolve, reject) => {
+            this.notifyStop = () => resolve();
+        })
     }
 
     start(disconnect?: Function): Promise<IPubSub> {
+        this.notifyStart();
         return Promise.resolve(this);
     }
 
     stop(): Promise<void> {
+        this.notifyStop();
         this.isStopped = true;
         return Promise.resolve(void 0);
     }
@@ -109,7 +125,7 @@ class Channel implements IChannel {
         return this.pubsub.subscriptionCache;
     };
 
-    private readonly pubsub: PubSubMicroUnvalidated;
+    public pubsub: PubSubMicroUnvalidated;
 
     constructor(name: string, pubsub: PubSubMicroUnvalidated) {
         this.name = name;
