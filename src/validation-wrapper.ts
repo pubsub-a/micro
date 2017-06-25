@@ -124,7 +124,7 @@ class ChannelValidated implements IChannel {
         }
 
         if (this.pubsub.isStopped) {
-            const err = new Error("publish after pubsub instance has stopped");
+            const err = new Error(`publish after pubsub instance has stopped, encountered when publishing on topic: ${topic}`);
             return Promise.reject(err);
         }
 
@@ -139,7 +139,7 @@ class ChannelValidated implements IChannel {
         this.stringValidator.validateTopicName(topic);
 
         if (this.pubsub.isStopped) {
-            const err = new Error("subscribe after pubsub has stoped");
+            const err = new Error(`subscribe after pubsub instance has stopped, topic was: ${topic}`);
             return Promise.reject(err);
         }
 
