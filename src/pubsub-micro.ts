@@ -3,6 +3,7 @@ import {
     IChannel,
     ISubscriptionToken,
     IObserverFunc,
+    StopReason
 } from 'pubsub-a-interfaces';
 
 import { BucketHash } from './buckethash';
@@ -37,12 +38,12 @@ export class PubSubMicroUnvalidated implements IPubSub {
     public isStarted = false;
 
     public onStart: Promise<void>;
-    public onStop: Promise<void>;
+    public onStop: Promise<StopReason | undefined>;
 
     public clientId: string = "";
 
     private notifyStart: () => void;
-    private notifyStop: () => void;
+    private notifyStop: (reason?: StopReason) => void;
 
     constructor(subscriptionCache?: SubscriptionCache) {
         if (subscriptionCache === undefined)
@@ -54,8 +55,8 @@ export class PubSubMicroUnvalidated implements IPubSub {
             this.notifyStart = () => resolve();
         })
 
-        this.onStop = new Promise<void>((resolve, reject) => {
-            this.notifyStop = () => resolve();
+        this.onStop = new Promise<StopReason | undefined>((resolve, reject) => {
+            this.notifyStop = (reason) => resolve(reason);
         })
     }
 
@@ -64,8 +65,8 @@ export class PubSubMicroUnvalidated implements IPubSub {
         return Promise.resolve(this);
     }
 
-    stop(): Promise<void> {
-        this.notifyStop();
+    stop(reason: StopReason = "LOCAL_DISCONNECT"): Promise<void> {
+        this.notifyStop(reason);
         this.isStopped = true;
         return Promise.resolve(void 0);
     }

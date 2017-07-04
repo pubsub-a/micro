@@ -3,6 +3,7 @@ import {
     IChannel,
     ISubscriptionToken,
     IObserverFunc,
+    StopReason
 } from 'pubsub-a-interfaces';
 
 import { PubSubMicroUnvalidated } from "./pubsub-micro";
@@ -62,9 +63,9 @@ export class PubSubValidationWrapper implements IPubSub
         return this.pubsub.start(onStopByExternal);
     }
 
-    stop(): Promise<void> {
+    stop(reason: StopReason = "LOCAL_DISCONNECT"): Promise<void> {
         this.isStopped = true;
-        return this.pubsub.stop();
+        return this.pubsub.stop(reason);
     }
 
     channel(name: string): Promise<IChannel> {
