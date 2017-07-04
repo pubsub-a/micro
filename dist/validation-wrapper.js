@@ -53,9 +53,10 @@ var PubSubValidationWrapper = (function () {
         }
         return this.pubsub.start(onStopByExternal);
     };
-    PubSubValidationWrapper.prototype.stop = function () {
+    PubSubValidationWrapper.prototype.stop = function (reason) {
+        if (reason === void 0) { reason = "LOCAL_DISCONNECT"; }
         this.isStopped = true;
-        return this.pubsub.stop();
+        return this.pubsub.stop(reason);
     };
     PubSubValidationWrapper.prototype.channel = function (name) {
         var _this = this;

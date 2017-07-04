@@ -1,4 +1,4 @@
-import { IPubSub, IChannel } from 'pubsub-a-interfaces';
+import { IPubSub, IChannel, StopReason } from 'pubsub-a-interfaces';
 import { TopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string-validation";
 /**
  * Takes an IPubSub and wrapps it, additionally checking
@@ -13,11 +13,11 @@ export declare class PubSubValidationWrapper implements IPubSub {
     isStopped: boolean;
     isStarted: boolean;
     readonly onStart: Promise<void>;
-    readonly onStop: Promise<void>;
+    readonly onStop: Promise<"REMOTE_DISCONNECT" | "LOCAL_DISCONNECT" | "TIMEOUT" | "UNSPECIFIED_ERROR" | undefined>;
     readonly clientId: string;
     constructor(wrappedPubSub: IPubSub);
     setTopicChannelNameSettings(settings: DefaultTopicChannelNameValidatorSettings): void;
     start(onStopByExternal?: Function): Promise<IPubSub>;
-    stop(): Promise<void>;
+    stop(reason?: StopReason): Promise<void>;
     channel(name: string): Promise<IChannel>;
 }

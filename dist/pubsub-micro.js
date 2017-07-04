@@ -48,15 +48,16 @@ var PubSubMicroUnvalidated = (function () {
             _this.notifyStart = function () { return resolve(); };
         });
         this.onStop = new Promise(function (resolve, reject) {
-            _this.notifyStop = function () { return resolve(); };
+            _this.notifyStop = function (reason) { return resolve(reason); };
         });
     }
     PubSubMicroUnvalidated.prototype.start = function (disconnect) {
         this.notifyStart();
         return Promise.resolve(this);
     };
-    PubSubMicroUnvalidated.prototype.stop = function () {
-        this.notifyStop();
+    PubSubMicroUnvalidated.prototype.stop = function (reason) {
+        if (reason === void 0) { reason = "LOCAL_DISCONNECT"; }
+        this.notifyStop(reason);
         this.isStopped = true;
         return Promise.resolve(void 0);
     };
