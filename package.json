@@ -21,7 +21,7 @@
     "mocha": "^3.0.2",
     "pubsub-a-interfaces": "git@bitbucket.org:pubsub-a/pubsub-a-interfaces.git",
     "typescript": "2.4.x",
-    "uglifyjs": "^2.4.10",
+    "uglify-js": "^3.0.26",
     "webpack": "^1.13.1"
   },
   "scripts": {
