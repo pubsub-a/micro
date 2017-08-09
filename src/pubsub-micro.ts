@@ -4,7 +4,7 @@ import {
     ISubscriptionToken,
     IObserverFunc,
     StopReason
-} from 'pubsub-a-interfaces';
+} from '@dynalon/pubsub-a-interfaces';
 
 import { BucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';

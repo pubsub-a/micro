@@ -1,4 +1,4 @@
-import { ISubscriptionToken } from 'pubsub-a-interfaces';
+import { ISubscriptionToken } from '@dynalon/pubsub-a-interfaces';
 
 export interface IDisposeFunction {
     (): Promise<number>;

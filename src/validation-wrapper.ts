@@ -4,7 +4,7 @@ import {
     ISubscriptionToken,
     IObserverFunc,
     StopReason
-} from 'pubsub-a-interfaces';
+} from '@dynalon/pubsub-a-interfaces';
 
 import { PubSubMicroUnvalidated } from "./pubsub-micro";
 import { TopicChannelNameValidator, DefaultTopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string-validation";

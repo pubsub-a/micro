@@ -6,7 +6,10 @@
         "sourceMap": true,
         "module": "commonjs",
         "strictNullChecks": true,
-        "lib": [ "es5", "es2015.promise" ]
+        "lib": [
+            "es5",
+            "es2015.promise"
+        ]
     },
     "include": [
         "src/*.ts"
