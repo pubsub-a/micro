@@ -3,7 +3,7 @@
 # Only use spaces to indent your .yml configuration.
 # -----
 # You can specify a custom docker image from Docker Hub as your build environment.
-image: node:7-wheezy
+image: node:8.4-stretch
 
 
 pipelines:
@@ -11,8 +11,10 @@ pipelines:
     - step:
         caches:
           - node
-        script: # Modify the commands below to build your repository.
+        script:
+          # Install access token for accessing @dynalon/* repors
           - printf "//`node -p \"require('url').parse(process.env.NPM_REGISTRY_URL || 'https://registry.npmjs.org').host\"`/:_authToken=${NPM_TOKEN}\nregistry=${NPM_REGISTRY_URL:-https://registry.npmjs.org}\n" >> ~/.npmrc
+
           - npm install
           - npm run build
-          - npm run node-tests
+          - npm run test

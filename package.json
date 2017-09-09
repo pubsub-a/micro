@@ -11,25 +11,12 @@
   "devDependencies": {
     "@dynalon/pubsub-a-interfaces": "^0.2.1",
     "chai": "^3.5.0",
-    "karma": "^1.3.0",
-    "karma-chai": "^0.1.0",
-    "karma-chrome-launcher": "^2.0.0",
-    "karma-cli": "^1.0.1",
-    "karma-firefox-launcher": "^1.0.0",
-    "karma-mocha": "^1.1.1",
-    "karma-phantomjs-launcher": "^1.0.2",
     "mocha": "^3.0.2",
-    "typescript": "2.5.x",
-    "uglify-js": "^3.0.26",
-    "webpack": "^1.13.1"
+    "typescript": "2.5.x"
   },
   "scripts": {
-    "build": "npm run compile && npm run bundle && npm run uglify",
+    "build": "npm run compile",
     "compile": "tsc",
-    "bundle": "webpack",
-    "node-tests": "mocha tests/spec/*.js",
-    "browser-tests": "karma start",
-    "test": "npm run node-tests && npm run browser-tests",
-    "uglify": "uglifyjs -o dist/bundle/pubsub-a-micro.umd.min.js dist/bundle/pubsub-a-micro.umd.js"
+    "test": "mocha tests/spec/*.js"
   }
 }
