@@ -16,11 +16,10 @@ const getLinkedPubSubImplementation = function (numInstances: number) {
     const instance = new PubSub();
     const sharedSubscriptionCache = instance.subscriptionCache;
 
-    const instances = [];
+    const instances: Array<any> = [];
 
     while (numInstances-- > 0) {
-        // PubSubMicro is object instance based, always return the same object instance
-       (instances as any).push(new PubSub(sharedSubscriptionCache));
+       instances.push(new PubSub(sharedSubscriptionCache));
     }
 
     return instances;
