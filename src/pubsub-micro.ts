@@ -3,7 +3,7 @@ import {
     IChannel,
     ISubscriptionToken,
     IObserverFunc,
-    StopReason
+    StopStatus
 } from '@dynalon/pubsub-a-interfaces';
 
 import { BucketHash } from './buckethash';
@@ -38,12 +38,12 @@ export class PubSubMicroUnvalidated implements IPubSub {
     public isStarted = false;
 
     public onStart: Promise<void>;
-    public onStop: Promise<StopReason | undefined>;
+    public onStop: Promise<StopStatus>;
 
     public clientId: string = "";
 
     private notifyStart: () => void;
-    private notifyStop: (reason?: StopReason) => void;
+    private notifyStop: (status: StopStatus) => void;
 
     constructor(subscriptionCache?: SubscriptionCache) {
         if (subscriptionCache === undefined)
@@ -55,18 +55,18 @@ export class PubSubMicroUnvalidated implements IPubSub {
             this.notifyStart = () => resolve();
         })
 
-        this.onStop = new Promise<StopReason | undefined>((resolve, reject) => {
+        this.onStop = new Promise<StopStatus>((resolve, reject) => {
             this.notifyStop = (reason) => resolve(reason);
         })
     }
 
-    start(disconnect?: Function): Promise<IPubSub> {
+    start(): Promise<IPubSub> {
         this.notifyStart();
         return Promise.resolve(this);
     }
 
-    stop(reason: StopReason = "LOCAL_DISCONNECT"): Promise<void> {
-        this.notifyStop(reason);
+    stop(status: StopStatus = { reason: "LOCAL_DISCONNECT" }): Promise<void> {
+        this.notifyStop(status);
         this.isStopped = true;
         return Promise.resolve(void 0);
     }
@@ -185,5 +185,4 @@ class Channel implements IChannel {
         promise = this.subscribe<T>(topic, subscribeAndDispose);
         return promise;
     }
-
 }

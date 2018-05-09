@@ -1,6 +1,6 @@
 {
   "name": "@dynalon/pubsub-a-micro",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Reference PubSub/A implementation",
   "license": "UNLICENSED",
   "main": "dist/pubsub.js",
@@ -9,7 +9,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@dynalon/pubsub-a-interfaces": "^0.2.1",
+    "@dynalon/pubsub-a-interfaces": "^0.3.0",
     "chai": "^3.5.0",
     "mocha": "^3.0.2",
     "typescript": "2.5.x"

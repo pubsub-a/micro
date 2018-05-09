@@ -3,7 +3,7 @@ import {
     IChannel,
     ISubscriptionToken,
     IObserverFunc,
-    StopReason
+    StopStatus
 } from '@dynalon/pubsub-a-interfaces';
 
 import { PubSubMicroUnvalidated } from "./pubsub-micro";
@@ -47,7 +47,7 @@ export class PubSubValidationWrapper implements IPubSub
         this.stringValidator = new DefaultTopicChannelNameValidator(settings);
     }
 
-    start(onStopByExternal?: Function): Promise<IPubSub> {
+    start(): Promise<IPubSub> {
         if (this.isStopped) {
             const err = "Already stopped, can't restart. You need to create a new instance";
             return Promise.reject(err);
@@ -60,12 +60,12 @@ export class PubSubValidationWrapper implements IPubSub
             this.isStarted = true;
         }
 
-        return this.pubsub.start(onStopByExternal);
+        return this.pubsub.start();
     }
 
-    stop(reason: StopReason = "LOCAL_DISCONNECT"): Promise<void> {
+    stop(status: StopStatus = { reason: "LOCAL_DISCONNECT" }): Promise<void> {
         this.isStopped = true;
-        return this.pubsub.stop(reason);
+        return this.pubsub.stop(status);
     }
 
     channel(name: string): Promise<IChannel> {
