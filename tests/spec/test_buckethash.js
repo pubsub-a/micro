@@ -142,4 +142,26 @@ describe('BucketHash basic tests', function() {
     expect(keys.length).to.equal(2);
   });
 
+  it.only("should be able to create a really huge bucket", function() {
+    this.timeout(480000);
+    var hash = new BucketHash();
+    const limit = 8 * 1000 * 1000;
+    const start = new Date().getTime();
+    for (var i = 0; i <= limit; i++) {
+      hash.add(i.toString(), i);
+    }
+
+    const ellapsed = new Date().getTime() - start;
+    console.info("Writing " + limit + " elements took " + ellapsed + "ms");
+
+    console.info("starting access time test");
+    for (var j = 0; j <= limit; j += Math.floor(limit / 20)) {
+      const start = new Date().getTime();
+      const element = hash.get(j.toString())[0];
+      const ellapsed = new Date().getTime() - start;
+      expect(element).to.equal(j);
+      console.info("access time: " + ellapsed + "ms");
+    }
+  })
+
 });

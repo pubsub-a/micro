@@ -17,6 +17,6 @@
   "scripts": {
     "build": "npm run compile",
     "compile": "tsc",
-    "test": "mocha tests/spec/*.js"
+    "test": "mocha tests/spec/*.js -- --max-old-space-size=8192"
   }
 }
