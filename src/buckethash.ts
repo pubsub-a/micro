@@ -2,21 +2,7 @@
  * A Hashtable that contains a flat list of entries (bucket) for a given key.
  */
 export class BucketHash<T> {
-    private dict: Object = {};
-
-    /**
-     * To prevent collisions with reserved JavaScript propertie of Object, we prefix every key
-     * with a special character.
-     */
-    private encodeKey(key: string): string {
-        // prevent using JS internal properties of Object by using a prefix
-        // for all keys
-        return `%${key}`;
-    }
-
-    private decodeKey(key: string): string {
-        return key.substr(1);
-    }
+    private dict = new Map<string, T[]>()
 
     /**
      * Adds an element to the bucket addressed by key.
@@ -26,15 +12,14 @@ export class BucketHash<T> {
      *                       added.
      */
     add(key: string, item: T): number {
-        var dict = this.dict;
-        var encodedKey = this.encodeKey(key);
-
-        if (!dict.hasOwnProperty(encodedKey)) {
-            dict[encodedKey] = [item];
+        const dict = this.dict;
+        if (!dict.has(key)) {
+            dict.set(key, [item]);
             return 1;
         } else {
-            dict[encodedKey].push(item);
-            return dict[encodedKey].length;
+            const arr = dict.get(key);
+            arr!.push(item);
+            return arr!.length;
         }
     }
 
@@ -44,23 +29,18 @@ export class BucketHash<T> {
      * @return {Array<T>}     The bucket or an empty Array
      */
     get(key: string): Array<T> {
-        var encodedKey = this.encodeKey(key);
-        return this.dict[encodedKey] || [];
+        if (this.dict.has(key)) {
+            return this.dict.get(key)!
+        } else {
+            return [];
+        }
     }
 
     /**
      * Gets all keys in the bucket.
-     * @return {Array<string>}
      */
-    keys(): Array<string> {
-        const result: Array<string> = [];
-        for (let key of Object.keys(this.dict)) {
-            if (key[0] === '%') {
-                let decodedKey = this.decodeKey(key);
-                result.push(decodedKey);
-            }
-        };
-        return result;
+    keys(): IterableIterator<string>  {
+        return this.dict.keys();
     }
 
     /**
@@ -70,8 +50,7 @@ export class BucketHash<T> {
      * @return {boolean} State of existance of the key
      */
     exists(key: string): boolean {
-        var encodedKey = this.encodeKey(key);
-        return this.dict.hasOwnProperty(encodedKey);
+        return this.dict.has(key);
     }
 
     /**
@@ -90,8 +69,7 @@ export class BucketHash<T> {
      * @return {number}      The number of items in the bucket AFTER the element has been removed.
      */
     remove(key: string, item?: T): number {
-        const encodedKey = this.encodeKey(key);
-        const bucket: Array<T> = this.dict[encodedKey];
+        const bucket: Array<T> = this.dict.get(key)!;
 
         if (!bucket) {
             if (!item) {
@@ -105,7 +83,7 @@ export class BucketHash<T> {
         }
 
         if (!item) {
-            delete this.dict[encodedKey];
+            this.dict.delete(key);
             return 0;
         }
 
@@ -117,7 +95,7 @@ export class BucketHash<T> {
 
         // to save memory we remove the key completely when the bucket becomes empty
         if (bucket.length === 0)
-            delete this.dict[encodedKey];
+            this.dict.delete(key);
 
         return bucket.length;
     }
@@ -128,7 +106,7 @@ export class BucketHash<T> {
      * @param {any}        item [description]
      */
     private removeFromArray<T>(arr: Array<T>, item: T) {
-        var index = arr.indexOf(item);
+        const index = arr.indexOf(item);
 
         if (index >= 0)
             arr.splice(index, 1);

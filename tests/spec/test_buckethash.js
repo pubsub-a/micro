@@ -103,7 +103,7 @@ describe('BucketHash basic tests', function() {
     hash.add("key2", item);
     hash.add("key3", item);
 
-    var keys = hash.keys();
+    var keys = Array.from(hash.keys());
     expect(keys).to.include("key1");
     expect(keys).to.include("key2");
     expect(keys).to.include("key3");
@@ -119,7 +119,7 @@ describe('BucketHash basic tests', function() {
     hash.add("key3", item);
     hash.remove("key1", item);
 
-    var keys = hash.keys();
+    var keys = Array.from(hash.keys());
     expect(keys).to.include("key2");
     expect(keys).to.include("key3");
 
@@ -135,17 +135,17 @@ describe('BucketHash basic tests', function() {
     hash.add("key3", item);
     hash.clear("key1");
 
-    var keys = hash.keys();
+    var keys = Array.from(hash.keys());
     expect(keys).to.include("key2");
     expect(keys).to.include("key3");
 
     expect(keys.length).to.equal(2);
   });
 
-  it.only("should be able to create a really huge bucket", function() {
+  it("should be able to create a really huge bucket", function() {
     this.timeout(480000);
     var hash = new BucketHash();
-    const limit = 8 * 1000 * 1000;
+    const limit = 10 * 1000 * 1000;
     const start = new Date().getTime();
     for (var i = 0; i <= limit; i++) {
       hash.add(i.toString(), i);
@@ -155,7 +155,7 @@ describe('BucketHash basic tests', function() {
     console.info("Writing " + limit + " elements took " + ellapsed + "ms");
 
     console.info("starting access time test");
-    for (var j = 0; j <= limit; j += Math.floor(limit / 20)) {
+    for (var j = 0; j <= limit; j += Math.floor(limit / 10)) {
       const start = new Date().getTime();
       const element = hash.get(j.toString())[0];
       const ellapsed = new Date().getTime() - start;
@@ -163,5 +163,4 @@ describe('BucketHash basic tests', function() {
       console.info("access time: " + ellapsed + "ms");
     }
   })
-
 });
