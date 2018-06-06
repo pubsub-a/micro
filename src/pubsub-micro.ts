@@ -1,6 +1,7 @@
 import {
     PubSub,
     Channel as IChannel,
+    ChannelType,
     SubscriptionToken,
     ObserverFunc,
     StopStatus
@@ -71,9 +72,13 @@ export class PubSubMicroUnvalidated implements PubSub {
         return Promise.resolve(void 0);
     }
 
-    channel(name: string): Promise<Channel> {
-        const channel = new Channel(name, this);
-        return Promise.resolve(channel);
+    channel<TName extends string>(name: TName): Promise<ChannelType<TName>> {
+        if (name === "__internal") {
+            throw new Error("No support for __internal channel yet");
+        } else {
+            const channel = new Channel(name, this);
+            return Promise.resolve(channel as any);
+        }
     }
 }
 

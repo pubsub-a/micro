@@ -1,6 +1,7 @@
 import {
     PubSub,
     Channel as IChannel,
+    ChannelType,
     SubscriptionToken,
     ObserverFunc,
     StopStatus
@@ -66,7 +67,7 @@ export class PubSubValidationWrapper implements PubSub
         return this.pubsub.stop(status);
     }
 
-    channel(name: string): Promise<IChannel> {
+    channel<TName extends string>(name: TName): Promise<ChannelType<TName>>{
         if (this.isStopped) {
             const err = "Instance is stopped";
             return Promise.reject(new Error(err));
@@ -82,7 +83,7 @@ export class PubSubValidationWrapper implements PubSub
         // VALIDATION PASSED...
 
         return this.pubsub.channel(name).then(chan => {
-            return new ChannelValidated(name, chan, this);
+            return new ChannelValidated(name, chan, this) as any;
         });
     }
 }
