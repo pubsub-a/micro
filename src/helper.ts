@@ -1,6 +1,6 @@
-import { ISubscriptionToken } from "@dynalon/pubsub-a-interfaces";
+import { SubscriptionToken } from "@dynalon/pubsub-a-interfaces";
 
-export function safeDispose(token: ISubscriptionToken): Promise<number | undefined> {
+export function safeDispose(token: SubscriptionToken): Promise<number | undefined> {
     if (!token)
         throw new Error("token must be defined!");
 

@@ -1,14 +1,12 @@
 import {
-    IObserverFunc,
-    ISubscriptionToken,
+    ObserverFunc,
+    SubscriptionToken,
 } from '@dynalon/pubsub-a-interfaces';
 
-import { SubscriptionToken } from './subscription-token';
-
-export interface IPublisher<T> {
+export interface Publisher<T> {
     publish(obj: T, callback?: Function): void;
 }
 
-export interface ISubscriber<T> {
-    subscribe(observer: IObserverFunc<T>, callback?: Function): ISubscriptionToken;
+export interface Subscriber<T> {
+    subscribe(observer: ObserverFunc<T>, callback?: Function): SubscriptionToken;
 }

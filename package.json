@@ -9,7 +9,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@dynalon/pubsub-a-interfaces": "^0.3.0",
+    "@dynalon/pubsub-a-interfaces": "^0.4.1",
     "chai": "^3.5.0",
     "mocha": "^5.2.0",
     "typescript": "^2.9.1"

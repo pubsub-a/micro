@@ -5,7 +5,8 @@
         "declaration": true,
         "sourceMap": true,
         "module": "commonjs",
-        "strictNullChecks": true,
+        "strict": true,
+        "noUnusedLocals": true,
         "lib": [
             "es5",
             "es2015.promise",

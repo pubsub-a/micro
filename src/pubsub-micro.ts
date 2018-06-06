@@ -1,18 +1,18 @@
 import {
-    IPubSub,
-    IChannel,
-    ISubscriptionToken,
-    IObserverFunc,
+    PubSub,
+    Channel as IChannel,
+    SubscriptionToken,
+    ObserverFunc,
     StopStatus
 } from '@dynalon/pubsub-a-interfaces';
 
 import { BucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
-import { SubscriptionToken } from './subscription-token';
+import { SubscriptionTokenImpl } from './subscription-token';
 import { PubSubValidationWrapper } from "./validation-wrapper";
 import { invokeIfDefined, safeDispose } from "./helper";
 
-export type SubscriptionCache = BucketHash<IObserverFunc<any>>;
+export type SubscriptionCache = BucketHash<ObserverFunc<any>>;
 
 export class PubSubMicroValidated extends PubSubValidationWrapper {
 
@@ -30,7 +30,7 @@ export class PubSubMicroValidated extends PubSubValidationWrapper {
     }
 }
 
-export class PubSubMicroUnvalidated implements IPubSub {
+export class PubSubMicroUnvalidated implements PubSub {
 
     public readonly subscriptionCache: SubscriptionCache
 
@@ -42,12 +42,12 @@ export class PubSubMicroUnvalidated implements IPubSub {
 
     public clientId: string = "";
 
-    private notifyStart: () => void;
-    private notifyStop: (status: StopStatus) => void;
+    private notifyStart: (() => void) | undefined;
+    private notifyStop: ((status: StopStatus) => void) | undefined;
 
     constructor(subscriptionCache?: SubscriptionCache) {
         if (subscriptionCache === undefined)
-            this.subscriptionCache = new BucketHash<IObserverFunc<any>>();
+            this.subscriptionCache = new BucketHash<ObserverFunc<any>>();
         else
             this.subscriptionCache = subscriptionCache;
 
@@ -60,24 +60,24 @@ export class PubSubMicroUnvalidated implements IPubSub {
         })
     }
 
-    start(): Promise<IPubSub> {
-        this.notifyStart();
+    start(): Promise<PubSub> {
+        this.notifyStart!();
         return Promise.resolve(this);
     }
 
     stop(status: StopStatus = { reason: "LOCAL_DISCONNECT" }): Promise<void> {
-        this.notifyStop(status);
+        this.notifyStop!(status);
         this.isStopped = true;
         return Promise.resolve(void 0);
     }
 
-    channel(name: string): Promise<IChannel> {
+    channel(name: string): Promise<Channel> {
         const channel = new Channel(name, this);
         return Promise.resolve(channel);
     }
 }
 
-class Publisher<T> implements InternalInterfaces.IPublisher<T> {
+class Publisher<T> implements InternalInterfaces.Publisher<T> {
 
     encodedTopic: string;
 
@@ -89,7 +89,7 @@ class Publisher<T> implements InternalInterfaces.IPublisher<T> {
     }
 
     publish(obj: T): void {
-        var subs = this.bucket.get(this.encodedTopic);
+        const subs = this.bucket.get(this.encodedTopic);
         for (let observer of subs) {
             try {
                 observer(obj);
@@ -101,12 +101,12 @@ class Publisher<T> implements InternalInterfaces.IPublisher<T> {
     }
 }
 
-class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
+class Subscriber<T> implements InternalInterfaces.Subscriber<T> {
 
     constructor(public encodedTopic: string, private bucket: SubscriptionCache) {
     }
 
-    subscribe(observer: IObserverFunc<T>): ISubscriptionToken {
+    subscribe(observer: ObserverFunc<T>): SubscriptionToken {
         const number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
 
         const onDispose = () => {
@@ -114,7 +114,7 @@ class Subscriber<T> implements InternalInterfaces.ISubscriber<T> {
             return Promise.resolve(remaining);
         };
 
-        return new SubscriptionToken(onDispose, number_of_subscriptions);
+        return new SubscriptionTokenImpl(onDispose, number_of_subscriptions);
     }
 }
 
@@ -146,14 +146,14 @@ class Channel implements IChannel {
     }
 
     publish<T>(topic: string, payload: T, callback?: Function): Promise<any> {
-        var publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
+        const publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
         return Promise.resolve();
     }
 
-    subscribe<T>(topic: string, observer: IObserverFunc<T>)
-        : Promise<ISubscriptionToken> {
+    subscribe<T>(topic: string, observer: ObserverFunc<T>)
+        : Promise<SubscriptionToken> {
 
         if (!observer) {
             throw new Error("observer function must be given and be of type function");
@@ -166,12 +166,12 @@ class Channel implements IChannel {
     }
 
 
-    once<T>(topic: string, observer: IObserverFunc<T>): Promise<ISubscriptionToken> {
+    once<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
 
-        let promise: Promise<ISubscriptionToken>;
+        let promise: Promise<SubscriptionToken>;
         let alreadyRun = false;
 
-        let subscribeAndDispose: IObserverFunc<T> = ((payload: T) => {
+        let subscribeAndDispose: ObserverFunc<T> = ((payload: T) => {
             if (alreadyRun) return;
             alreadyRun = true;
 

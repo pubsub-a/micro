@@ -1,10 +1,10 @@
-import { ISubscriptionToken } from '@dynalon/pubsub-a-interfaces';
+import { SubscriptionToken } from '@dynalon/pubsub-a-interfaces';
 
 export interface IDisposeFunction {
     (): Promise<number>;
 }
 
-export class SubscriptionToken implements ISubscriptionToken {
+export class SubscriptionTokenImpl implements SubscriptionToken {
 
     public isDisposed: boolean = false;
     public count: number;

@@ -1,14 +1,12 @@
 import {
-    IPubSub,
-    IChannel,
-    ISubscriptionToken,
-    IObserverFunc,
+    PubSub,
+    Channel as IChannel,
+    SubscriptionToken,
+    ObserverFunc,
     StopStatus
 } from '@dynalon/pubsub-a-interfaces';
 
-import { PubSubMicroUnvalidated } from "./pubsub-micro";
 import { TopicChannelNameValidator, DefaultTopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string-validation";
-import { invokeIfDefined } from "./helper";
 
 /**
  * Takes an IPubSub and wrapps it, additionally checking
@@ -16,9 +14,9 @@ import { invokeIfDefined } from "./helper";
  * - the correct stop/start behaviour and throws exception if used after stopped
  * - makes sure only plain objects are published and optionally checks the message payload size.
  */
-export class PubSubValidationWrapper implements IPubSub
+export class PubSubValidationWrapper implements PubSub
 {
-    protected pubsub: IPubSub;
+    protected pubsub: PubSub;
 
     public stringValidator: TopicChannelNameValidator;
 
@@ -38,7 +36,7 @@ export class PubSubValidationWrapper implements IPubSub
         return this.pubsub.clientId;
     }
 
-    constructor(wrappedPubSub: IPubSub) {
+    constructor(wrappedPubSub: PubSub) {
         this.pubsub = wrappedPubSub;
         this.stringValidator = new DefaultTopicChannelNameValidator();
     }
@@ -47,7 +45,7 @@ export class PubSubValidationWrapper implements IPubSub
         this.stringValidator = new DefaultTopicChannelNameValidator(settings);
     }
 
-    start(): Promise<IPubSub> {
+    start(): Promise<PubSub> {
         if (this.isStopped) {
             const err = "Already stopped, can't restart. You need to create a new instance";
             return Promise.reject(err);
@@ -142,7 +140,7 @@ class ChannelValidated implements IChannel {
         return this.wrappedChannel.publish<T>(topic, payload);
     }
 
-    subscribe<T>(topic: string, observer: IObserverFunc<T>): Promise<ISubscriptionToken> {
+    subscribe<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
         if (typeof topic !== 'string' || topic == "")
             throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
         this.stringValidator.validateTopicName(topic);
@@ -155,7 +153,7 @@ class ChannelValidated implements IChannel {
         return this.wrappedChannel.subscribe<T>(topic, observer);
     }
 
-    once<T>(topic: string, observer: IObserverFunc<T>): Promise<ISubscriptionToken> {
+    once<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
         if (typeof topic !== 'string' || topic == "")
             throw new Error("topic must be a non-zerolength string")
         this.stringValidator.validateTopicName(topic);
