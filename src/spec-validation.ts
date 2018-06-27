@@ -1,4 +1,4 @@
-import { PubSubMicro, PubSubMicroUnvalidated } from "./pubsub";
+import { PubSubMicro, PubSubMicroUnvalidated} from "./pubsub";
 import { DefaultValidator, ValidationOptions } from "./string-validation";
 import { addValidation } from "./validation-wrapper";
 
@@ -12,7 +12,7 @@ function getValidatedInstance(validationOptions: ValidationOptions) {
 }
 
 const getPubSubImplementation = function (options?: any) {
-    return new PubSubMicro();
+    return new (PubSubMicro as any)();
 };
 
 const getLinkedPubSubImplementation = function (numInstances: number, options: any) {

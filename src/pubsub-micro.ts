@@ -1,17 +1,9 @@
-import {
-    PubSub,
-    Channel as IChannel,
-    ChannelType,
-    SubscriptionToken,
-    ObserverFunc,
-    StopStatus
-} from '@dynalon/pubsub-a-interfaces';
-
+import { Channel as IChannel, ChannelType, ObserverFunc, PubSub, StopStatus, SubscriptionToken } from '@dynalon/pubsub-a-interfaces';
 import { BucketHash } from './buckethash';
-import * as InternalInterfaces from './internal-interfaces';
-import { SubscriptionTokenImpl } from './subscription-token';
-import { addValidation } from "./validation-wrapper";
 import { invokeIfDefined, safeDispose } from "./helper";
+import * as InternalInterfaces from './internal-interfaces';
+import { SubscriptionTokenImpl } from './subscription-token';
+
 
 export type SubscriptionCache = BucketHash<ObserverFunc<any>>;
 
@@ -204,5 +196,3 @@ class Channel implements IChannel {
         return promise;
     }
 }
-
-export const PubSubMicroValidated: PubSubMicro = addValidation(PubSubMicro) as any;
