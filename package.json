@@ -1,6 +1,6 @@
 {
   "name": "@dynalon/pubsub-a-micro",
-  "version": "0.6.5",
+  "version": "0.6.6",
   "description": "Reference PubSub/A implementation",
   "license": "UNLICENSED",
   "main": "dist/pubsub.js",
