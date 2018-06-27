@@ -3,6 +3,7 @@ import { BucketHash } from './buckethash';
 import { invokeIfDefined, safeDispose } from "./helper";
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionTokenImpl } from './subscription-token';
+import { DefaultValidator, NameValidator } from './string-validation';
 
 
 export type SubscriptionCache = BucketHash<ObserverFunc<any>>;
@@ -27,6 +28,7 @@ export type SubscriptionCache = BucketHash<ObserverFunc<any>>;
 export class PubSubMicro implements PubSub {
 
     public readonly subscriptionCache: SubscriptionCache
+    public readonly validator: NameValidator;
 
     public isStopped = false;
     public isStarted = false;
@@ -36,14 +38,15 @@ export class PubSubMicro implements PubSub {
 
     public clientId: string = "";
 
-    private notifyStart: (() => void) | undefined;
-    private notifyStop: ((status: StopStatus) => void) | undefined;
+    private notifyStart: (() => void) | undefined;
+    private notifyStop: ((status: StopStatus) => void) | undefined;
 
-    constructor(linkedInstance?: PubSubMicro) {
-        if (linkedInstance)
-            this.subscriptionCache = linkedInstance.subscriptionCache;
-        else
-            this.subscriptionCache = new BucketHash<ObserverFunc<any>>();
+    constructor(linkedInstance?: PubSubMicro, validator?: NameValidator) {
+        this.subscriptionCache = linkedInstance
+            ? linkedInstance.subscriptionCache
+            : new BucketHash<ObserverFunc<any>>();
+
+        this.validator = validator || new DefaultValidator();
 
         this.onStart = new Promise<void>((resolve, reject) => {
             this.notifyStart = () => resolve();
@@ -79,6 +82,18 @@ export class PubSubMicro implements PubSub {
     }
 
     channel<TName extends string>(name: TName): Promise<ChannelType<TName>> {
+        if (this.isStopped) {
+            const err = "Instance is stopped";
+            return Promise.reject(new Error(err));
+        }
+        if (typeof name !== "string")
+            throw new Error("Channel name must be of type string");
+        if (name.length === 0)
+            throw new Error(`Channel name must be non-zerolength string`);
+
+        // TODO if validation fails, reject the promise?
+        this.validator.validateChannelName(name);
+
         if (name === "__internal") {
             throw new Error("No support for __internal channel yet");
         } else {
@@ -137,11 +152,14 @@ class Channel implements IChannel {
         return this.pubsub.subscriptionCache;
     };
 
+    private readonly validator: NameValidator
+
     public pubsub: PubSubMicro;
 
     constructor(name: string, pubsub: PubSubMicro) {
         this.name = name;
         this.pubsub = pubsub;
+        this.validator = pubsub.validator;
     }
 
     /**
@@ -157,18 +175,34 @@ class Channel implements IChannel {
     }
 
     publish<T>(topic: string, payload: T, callback?: Function): Promise<any> {
+        if (typeof topic !== 'string' || topic == "")
+            throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
+
+        if (this.pubsub.isStopped) {
+            const err = new Error(`publish after pubsub instance has stopped, encountered when publishing on topic: ${topic}`);
+            return Promise.reject(err);
+        }
+
+        this.validator.validateTopicName(topic);
+
         const publisher = new Publisher<T>(this.encodeTopic(topic), this.subscriptionCache);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
         return Promise.resolve();
     }
 
-    subscribe<T>(topic: string, observer: ObserverFunc<T>)
-        : Promise<SubscriptionToken> {
-
+    subscribe<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
         if (!observer) {
             throw new Error("observer function must be given and be of type function");
         }
+        if (typeof topic !== 'string' || topic == "")
+            throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
+
+        if (this.pubsub.isStopped) {
+            return Promise.reject("PubSub instance has stopped")
+        }
+
+        this.validator.validateTopicName(topic);
 
         const subscriber = new Subscriber<T>(this.encodeTopic(topic), this.subscriptionCache);
         const subscription = subscriber.subscribe(observer);
@@ -177,6 +211,9 @@ class Channel implements IChannel {
     }
 
     once<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
+        if (typeof topic !== 'string' || topic == "")
+            throw new Error("topic must be a non-zerolength string")
+        this.validator.validateTopicName(topic);
 
         let promise: Promise<SubscriptionToken>;
         let alreadyRun = false;

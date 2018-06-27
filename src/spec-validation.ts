@@ -1,14 +1,14 @@
-import { PubSubMicro, PubSubMicroUnvalidated} from "./pubsub";
+import { PubSubMicro } from "./pubsub";
 import { DefaultValidator, ValidationOptions } from "./string-validation";
-import { addValidation } from "./validation-wrapper";
 
 /**
  *  Code required so that we can run in the spec validation test suite that comes with the pubsub-a-interface
  *  project (not to be confused with our own unit tests in the spec/ folder).
  */
 
-function getValidatedInstance(validationOptions: ValidationOptions) {
-    return addValidation(PubSubMicroUnvalidated, new DefaultValidator(validationOptions))
+function getValidatedInstance(linkedInstance?: PubSubMicro, validationOptions?: ValidationOptions) {
+    const validator = new DefaultValidator(validationOptions);
+    return new PubSubMicro(linkedInstance, validator);
 }
 
 const getPubSubImplementation = function (options?: any) {
@@ -16,20 +16,24 @@ const getPubSubImplementation = function (options?: any) {
 };
 
 const getLinkedPubSubImplementation = function (numInstances: number, options: any) {
-    let PubSubCtor: any = PubSubMicro;
-    if (options && options.validationOptions)
-        PubSubCtor = getValidatedInstance(options.validationOptions)
 
     if (!numInstances) {
         numInstances = 2;
     }
 
-    let instance = new PubSubCtor();
+    let instance: PubSubMicro;
+    if (options && options.validationOptions)
+        instance = getValidatedInstance(undefined, options.validationOptions);
+    else
+        instance = new PubSubMicro();
 
     const instances: Array<any> = [];
 
     while (numInstances-- > 0) {
-        instances.push(new PubSubCtor(instance));
+        if (options && options.validationOptions)
+            instances.push(getValidatedInstance(undefined, options.validationOptions));
+        else
+            instances.push(new PubSubMicro(instance));
     }
 
     return instances;
