@@ -12,7 +12,7 @@ function getValidatedInstance(validationOptions: ValidationOptions) {
 }
 
 const getPubSubImplementation = function (options?: any) {
-    return new (PubSubMicro as any)();
+    return new PubSubMicro();
 };
 
 const getLinkedPubSubImplementation = function (numInstances: number, options: any) {

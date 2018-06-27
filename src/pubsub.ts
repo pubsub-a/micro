@@ -7,7 +7,7 @@ export * from "./string-validation";
 export { invokeIfDefined, safeDispose } from "./helper";
 
 import { PubSubMicro } from "./pubsub-micro";
-import { addValidation } from "./validation-wrapper";
+import { addValidation, Constructor } from "./validation-wrapper";
 
-const PubSubMicroValidated: PubSubMicro = (addValidation(PubSubMicro) as any) as PubSubMicro;
-export { PubSubMicroValidated as PubSubMicro };
+const PubSubMicroValidated: Constructor<PubSubMicro> = (addValidation(PubSubMicro) as any);
+export { PubSubMicroValidated as PubSubMicro, PubSubMicroValidated };
