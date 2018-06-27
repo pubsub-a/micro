@@ -15,7 +15,7 @@ describe('BucketHash basic tests', function() {
   });
 
 
-  it ("should remove the last element and return 0 as the number of elements", function() {
+  it("should remove the last element and return 0 as the number of elements", function () {
     var hash = new BucketHash();
     var item = {};
     hash.add('key', item);
@@ -24,7 +24,7 @@ describe('BucketHash basic tests', function() {
   });
 
 
-  it ("should only remove a single element in a bucket with duplicates", function() {
+  it("should only remove a single element in a bucket with duplicates", function () {
     var hash = new BucketHash();
     var item = {};
     hash.add('key', item);
@@ -34,36 +34,36 @@ describe('BucketHash basic tests', function() {
     expect(count).to.equal(1);
   });
 
-  it ("should not throw an exception if we try to clear an empty bucket", function() {
+  it("should not throw an exception if we try to clear an empty bucket", function () {
     var hash = new BucketHash();
-    var fn = function() {
+    var fn = function () {
       hash.clear('key');
     };
 
     expect(fn).not.to.throw();
   });
 
-  it ("should throw an exception if the key does not exist but an item to remove is specified", function() {
+  it("should throw an exception if the key does not exist but an item to remove is specified", function () {
     var hash = new BucketHash();
     var item = {};
-    var fn = function() {
+    var fn = function () {
       hash.remove('key', item);
     };
 
     expect(fn).to.throw();
   });
 
-  it ("throw an exception if the element is not in the bucket", function() {
+  it("throw an exception if the element is not in the bucket", function () {
     var hash = new BucketHash();
     var item = {};
     var nonexistingitem = 1;
     hash.add('key', item);
     hash.add('key', item);
 
-    expect(function() { hash.remove('key', nonexistingitem); }).to.throw();
+    expect(function () { hash.remove('key', nonexistingitem); }).to.throw();
   });
 
-  it ("should not have any elements for a key if it is removed", function() {
+  it("should not have any elements for a key if it is removed", function () {
     var hash = new BucketHash();
     var item = 'foo';
     hash.add('key1', item);
@@ -83,9 +83,9 @@ describe('BucketHash basic tests', function() {
     expect(JSON.stringify(hash.dict)).to.equal('{}');
   });
 
-  it ("should not have any elements for a cleared key", function() {
+  it("should not have any elements for a cleared key", function () {
     var hash = new BucketHash();
-    var item = function() {};
+    var item = function () { };
     hash.add('key', item);
     hash.add('key', item);
     hash.add('key', item);
@@ -96,7 +96,7 @@ describe('BucketHash basic tests', function() {
     expect(str).to.equal('{}');
   });
 
-  it ("should be able to get all keys", function() {
+  it("should be able to get all keys", function () {
     var hash = new BucketHash();
     var item = {};
     hash.add("key1", item);
@@ -111,7 +111,7 @@ describe('BucketHash basic tests', function() {
     expect(keys.length).to.equal(3);
   });
 
-  it("should be able to get all keys and do not include empty buckets", function() {
+  it("should be able to get all keys and do not include empty buckets", function () {
     var hash = new BucketHash();
     var item = {};
     hash.add("key1", item);
@@ -126,7 +126,7 @@ describe('BucketHash basic tests', function() {
     expect(keys.length).to.equal(2);
   });
 
-  it("should be able to get all keys and do not include cleared buckets", function() {
+  it("should be able to get all keys and do not include cleared buckets", function () {
     var hash = new BucketHash();
     var item = {};
     hash.add("key1", item);
@@ -142,7 +142,7 @@ describe('BucketHash basic tests', function() {
     expect(keys.length).to.equal(2);
   });
 
-  it("should be able to create a really huge bucket", function() {
+  it("should be able to create a really huge bucket", function () {
     this.timeout(480000);
     var hash = new BucketHash();
     const limit = 10 * 1000 * 1000;

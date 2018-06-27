@@ -1,4 +1,4 @@
-export interface DefaultTopicChannelNameValidatorSettings {
+export interface ValidationOptions {
     channelNameMaxLength: number;
     topicNameMaxLength: number;
 
@@ -6,16 +6,25 @@ export interface DefaultTopicChannelNameValidatorSettings {
     allowSpecialTopicSequences: boolean;
 }
 
-export interface TopicChannelNameValidator {
+export interface NameValidator {
     validateChannelName(name: string): void;
     validateTopicName(name: string): void;
 }
 
-export class DefaultTopicChannelNameValidator implements TopicChannelNameValidator {
+/**
+ * Checks if a string consists only of the characters A-z, 0-9 plus one of ": - _ /"
+ */
+export function hasOnlyValidChars(name: string): boolean {
+    const m = name.match(/([A-z0-9_:\/\-]+)/g);
+    const contains_invalid_chars = (m == null ||  m == undefined || m.length == 0 || m[0] !== name);
+    return !contains_invalid_chars;
+};
 
-    private settings: DefaultTopicChannelNameValidatorSettings;
+export class DefaultValidator implements NameValidator {
 
-    constructor(settings?: DefaultTopicChannelNameValidatorSettings) {
+    private settings: ValidationOptions;
+
+    constructor(settings?: ValidationOptions) {
         if (!settings) {
             settings = {
                 channelNameMaxLength: 63,
@@ -26,14 +35,7 @@ export class DefaultTopicChannelNameValidator implements TopicChannelNameValidat
         this.settings = settings;
     }
 
-    /**
-     * Checks if a string consists only of the characters A-z, 0-9 plus one of ": - _ /"
-     */
-    private containsOnlyValidChars(name: string): boolean {
-        const m = name.match(/([A-z0-9_:\/\-]+)/g);
-        const contains_invalid_chars = (m == null || m == undefined || m.length == 0 || m[0] !== name);
-        return !contains_invalid_chars;
-    };
+    private containsOnlyValidChars = hasOnlyValidChars;
 
     /**
      * Validates a channel to be between 1 and 63 characters long and consists only of

@@ -10,26 +10,27 @@ import {
 import { BucketHash } from './buckethash';
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionTokenImpl } from './subscription-token';
-import { PubSubValidationWrapper } from "./validation-wrapper";
+import { addValidation } from "./validation-wrapper";
 import { invokeIfDefined, safeDispose } from "./helper";
 
 export type SubscriptionCache = BucketHash<ObserverFunc<any>>;
 
-export class PubSubMicroValidated extends PubSubValidationWrapper {
 
-    /**
-     * To allow shared/link PubSub instances (for testing)
-     * expose the subscriptionCache so we can pass it to
-     * other instances
-     */
-    public get subscriptionCache() {
-        return (this.pubsub as PubSubMicroUnvalidated).subscriptionCache as SubscriptionCache;
-    }
+// export class PubSubMicroValidated extends PubSubValidationWrapper {
 
-    constructor(subscriptionCache?: SubscriptionCache) {
-        super(new PubSubMicroUnvalidated(subscriptionCache));
-    }
-}
+//     /**
+//      * To allow shared/link PubSub instances (for testing)
+//      * expose the subscriptionCache so we can pass it to
+//      * other instances
+//      */
+//     public get subscriptionCache() {
+//         return (this.pubsub as PubSubMicroUnvalidated).subscriptionCache as SubscriptionCache;
+//     }
+
+//     constructor(subscriptionCache?: SubscriptionCache) {
+//         super(new PubSubMicroUnvalidated(subscriptionCache));
+//     }
+// }
 
 export class PubSubMicroUnvalidated implements PubSub {
 
@@ -46,11 +47,11 @@ export class PubSubMicroUnvalidated implements PubSub {
     private notifyStart: (() => void) | undefined;
     private notifyStop: ((status: StopStatus) => void) | undefined;
 
-    constructor(subscriptionCache?: SubscriptionCache) {
-        if (subscriptionCache === undefined)
-            this.subscriptionCache = new BucketHash<ObserverFunc<any>>();
+    constructor(linkedInstance?: PubSubMicroUnvalidated) {
+        if (linkedInstance)
+            this.subscriptionCache = linkedInstance.subscriptionCache;
         else
-            this.subscriptionCache = subscriptionCache;
+            this.subscriptionCache = new BucketHash<ObserverFunc<any>>();
 
         this.onStart = new Promise<void>((resolve, reject) => {
             this.notifyStart = () => resolve();
@@ -62,13 +63,26 @@ export class PubSubMicroUnvalidated implements PubSub {
     }
 
     start(): Promise<PubSub> {
+        if (this.isStarted === true) {
+            throw new Error("Instance already started");
+        }
+
+        this.isStarted = true;
         this.notifyStart!();
         return Promise.resolve(this);
     }
 
     stop(status: StopStatus = { reason: "LOCAL_DISCONNECT" }): Promise<void> {
-        this.notifyStop!(status);
+        if (this.isStarted !== true) {
+            throw new Error("Can not stop instance before it was started");
+        }
+
+        if (this.isStopped === true) {
+            return Promise.resolve(void 0);
+        }
+
         this.isStopped = true;
+        this.notifyStop!(status);
         return Promise.resolve(void 0);
     }
 
@@ -86,15 +100,15 @@ class Publisher<T> implements InternalInterfaces.Publisher<T> {
 
     encodedTopic: string;
 
-    private bucket: SubscriptionCache
+    private subscriptionCache: SubscriptionCache
 
-    constructor(encodedTopic: string, bucket: SubscriptionCache) {
+    constructor(encodedTopic: string, subscriptionCache: SubscriptionCache) {
         this.encodedTopic = encodedTopic;
-        this.bucket = bucket;
+        this.subscriptionCache = subscriptionCache;
     }
 
     publish(obj: T): void {
-        const subs = this.bucket.get(this.encodedTopic);
+        const subs = this.subscriptionCache.get(this.encodedTopic);
         for (let observer of subs) {
             try {
                 observer(obj);
@@ -108,14 +122,14 @@ class Publisher<T> implements InternalInterfaces.Publisher<T> {
 
 class Subscriber<T> implements InternalInterfaces.Subscriber<T> {
 
-    constructor(public encodedTopic: string, private bucket: SubscriptionCache) {
+    constructor(public encodedTopic: string, private subscriptionCache: SubscriptionCache) {
     }
 
     subscribe(observer: ObserverFunc<T>): SubscriptionToken {
-        const number_of_subscriptions = this.bucket.add(this.encodedTopic, observer);
+        const number_of_subscriptions = this.subscriptionCache.add(this.encodedTopic, observer);
 
         const onDispose = () => {
-            const remaining = this.bucket.remove(this.encodedTopic, observer);
+            const remaining = this.subscriptionCache.remove(this.encodedTopic, observer);
             return Promise.resolve(remaining);
         };
 
@@ -127,7 +141,7 @@ class Channel implements IChannel {
 
     name: string;
 
-    private get bucket() {
+    private get subscriptionCache() {
         return this.pubsub.subscriptionCache;
     };
 
@@ -151,7 +165,7 @@ class Channel implements IChannel {
     }
 
     publish<T>(topic: string, payload: T, callback?: Function): Promise<any> {
-        const publisher = new Publisher<T>(this.encodeTopic(topic), this.bucket);
+        const publisher = new Publisher<T>(this.encodeTopic(topic), this.subscriptionCache);
         publisher.publish(payload);
         invokeIfDefined(callback, topic, payload);
         return Promise.resolve();
@@ -164,12 +178,11 @@ class Channel implements IChannel {
             throw new Error("observer function must be given and be of type function");
         }
 
-        const subscriber = new Subscriber<T>(this.encodeTopic(topic), this.bucket);
+        const subscriber = new Subscriber<T>(this.encodeTopic(topic), this.subscriptionCache);
         const subscription = subscriber.subscribe(observer);
 
         return Promise.resolve(subscription);
     }
-
 
     once<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
 
@@ -191,3 +204,9 @@ class Channel implements IChannel {
         return promise;
     }
 }
+
+export type PubSubMicro = {
+    new(linkedInstance?: PubSubMicro): PubSubMicro
+}
+
+export const PubSubMicroValidated: PubSubMicro = addValidation(PubSubMicroUnvalidated) as any;

@@ -1,164 +1,138 @@
 import {
     PubSub,
     Channel as IChannel,
-    ChannelType,
     SubscriptionToken,
     ObserverFunc,
-    StopStatus
 } from '@dynalon/pubsub-a-interfaces';
+import { NameValidator, DefaultValidator } from "./string-validation";
 
-import { TopicChannelNameValidator, DefaultTopicChannelNameValidator, DefaultTopicChannelNameValidatorSettings } from "./string-validation";
-
-/**
- * Takes an IPubSub and wrapps it, additionally checking
- * - any channel and topic string names for validity
- * - the correct stop/start behaviour and throws exception if used after stopped
- * - makes sure only plain objects are published and optionally checks the message payload size.
- */
-export class PubSubValidationWrapper implements PubSub
-{
-    protected pubsub: PubSub;
-
-    public stringValidator: TopicChannelNameValidator;
-
-    public enablePlainObjectCheck = true;
-
-    public isStopped = false;
-    public isStarted = false;
-
-    public get onStart() {
-        return this.pubsub.onStart;
-    }
-    public get onStop() {
-        return this.pubsub.onStop;
-    }
-
-    public get clientId(): string {
-        return this.pubsub.clientId;
-    }
-
-    constructor(wrappedPubSub: PubSub) {
-        this.pubsub = wrappedPubSub;
-        this.stringValidator = new DefaultTopicChannelNameValidator();
-    }
-
-    setTopicChannelNameSettings(settings: DefaultTopicChannelNameValidatorSettings) {
-        this.stringValidator = new DefaultTopicChannelNameValidator(settings);
-    }
-
-    start(): Promise<PubSub> {
-        if (this.isStopped) {
-            const err = "Already stopped, can't restart. You need to create a new instance";
-            return Promise.reject(err);
-        }
-
-        if (this.isStarted == true) {
-            const err = "Already started, can't start a second time.";
-            throw new Error(err);
-        } else {
-            this.isStarted = true;
-        }
-
-        return this.pubsub.start();
-    }
-
-    stop(status: StopStatus = { reason: "LOCAL_DISCONNECT" }): Promise<void> {
-        this.isStopped = true;
-        return this.pubsub.stop(status);
-    }
-
-    channel<TName extends string>(name: TName): Promise<ChannelType<TName>>{
-        if (this.isStopped) {
-            const err = "Instance is stopped";
-            return Promise.reject(new Error(err));
-        }
-
-        if (typeof name !== 'string')
-            throw new Error("Channel name must be of type string");
-        if (name == "")
-            throw new Error(`Channel name must be non-zerolength string`);
-
-        this.stringValidator.validateChannelName(name);
-
-        // VALIDATION PASSED...
-
-        return this.pubsub.channel(name).then(chan => {
-            return new ChannelValidated(name, chan, this) as any;
-        });
+function objectIsPlainObject(obj: any): boolean {
+    // TODO recursive checking, all corner cases etc.
+    // Use this poor-mans approach for now
+    if (typeof obj == 'object' && obj.constructor != Object) {
+        return false;
+    } else {
+        return true;
     }
 }
 
-class ChannelValidated implements IChannel {
+export type Constructor<T> = {
+    new(...args: any[]): T
+}
 
-    public pubsub: PubSubValidationWrapper;
+export function addValidation<P extends PubSub>(UnvalidatedPubSub: Constructor<P>, validator?: NameValidator) {
+    return new Proxy(UnvalidatedPubSub, {
+        construct(target, args) {
+            let unvalidatedPubSubInstance = new target(...args);
+            return new Proxy(unvalidatedPubSubInstance, new PubSubValidationProxy(validator))
+        }
+    })
+}
 
-    protected wrappedChannel: IChannel;
+export class PubSubValidationProxy {
+    private _stringValidator: NameValidator;
 
-    protected get stringValidator(): TopicChannelNameValidator {
-        return this.pubsub.stringValidator;
-    }
-
-    protected enablePlainObjectCheck: boolean;
-
-    public name: string;
-
-    constructor(name: string, wrappedChannel: IChannel, pubsub: PubSubValidationWrapper) {
-        this.name = name;
-        this.wrappedChannel = wrappedChannel;
-        this.pubsub = pubsub;
-        this.enablePlainObjectCheck = pubsub.enablePlainObjectCheck;
-    }
-
-    /**
-     * If the users passes in an object, it must be a plain object. Strings, numbers, array etc. are ok.
-     */
-    private objectIsPlainObject(obj: any): boolean {
-        // TODO recursive checking, all corner cases etc.
-        // Use this poor-mans approach for now
-        if (typeof obj == 'object' && obj.constructor != Object) {
-            return false;
+    constructor(validator?: NameValidator) {
+        if (validator) {
+            this._stringValidator = validator;
         } else {
-            return true;
+            this._stringValidator = new DefaultValidator();
         }
     }
 
-    publish<T>(topic: string, payload: T): Promise<any> {
+    get(obj: PubSub, prop: keyof PubSub) {
+        if (prop === "channel") {
+            return this.channel.bind(this, obj);
+        } else if (prop === "start") {
+            return this.start.bind(this, obj);
+        } else {
+            return obj[prop];
+        }
+    }
+
+    private channel(originalPubSub: PubSub, name: string): Promise<IChannel> {
+        if (originalPubSub.isStopped) {
+            const err = "Instance is stopped";
+            return Promise.reject(new Error(err));
+        }
+        if (typeof name !== "string")
+            throw new Error("Channel name must be of type string");
+        if (name.length === 0)
+            throw new Error(`Channel name must be non-zerolength string`);
+
+        // TODO if validation fails, reject the promise?
+        this._stringValidator.validateChannelName(name);
+
+        // VALIDATION PASSED...
+
+        return originalPubSub.channel(name).then(chan => {
+            return new Proxy(chan, new ChannelProxy(this._stringValidator))
+        });
+    }
+
+    private start(originalPubSub: PubSub, name: string): Promise<PubSub> {
+        if (originalPubSub.isStopped) {
+            throw new Error("start() called after and instance was stoped");
+        } else {
+            return originalPubSub.start();
+        }
+    }
+}
+
+export class ChannelProxy {
+
+    constructor(private _stringValidator: NameValidator, private enablePlainObjectCheck = true) {
+    }
+
+    get(obj: IChannel, prop: keyof IChannel) {
+
+        if (prop === "publish") {
+            return this.publish.bind(this, obj);
+        } else if (prop === "subscribe") {
+            return this.subscribe.bind(this, obj);
+        } else if (prop === "once") {
+            return this.once.bind(this, obj);
+        } else {
+            return obj[prop];
+        }
+    }
+
+    private publish<T>(originalChannel: IChannel, topic: string, payload: T): Promise<T> {
         if (typeof topic !== 'string' || topic == "")
             throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
 
-        if (this.enablePlainObjectCheck && !this.objectIsPlainObject(payload)) {
-            let err = new Error("only plain objects are allowed to be published");
-            throw err;
+        if (this.enablePlainObjectCheck && !objectIsPlainObject(payload)) {
+            throw new Error("only plain objects are allowed to be published");
         }
 
-        if (this.pubsub.isStopped) {
+        if (originalChannel.pubsub.isStopped) {
             const err = new Error(`publish after pubsub instance has stopped, encountered when publishing on topic: ${topic}`);
             return Promise.reject(err);
         }
 
-        this.stringValidator.validateTopicName(topic);
+        this._stringValidator.validateTopicName(topic);
 
-        return this.wrappedChannel.publish<T>(topic, payload);
+        return originalChannel.publish(topic, payload);
     }
 
-    subscribe<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
+    private subscribe<T>(originalChannel: IChannel, topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
         if (typeof topic !== 'string' || topic == "")
             throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
-        this.stringValidator.validateTopicName(topic);
+        this._stringValidator.validateTopicName(topic);
 
-        if (this.pubsub.isStopped) {
+        if (originalChannel.pubsub.isStopped) {
             const err = new Error(`subscribe after pubsub instance has stopped, topic was: ${topic}`);
             return Promise.reject(err);
         }
 
-        return this.wrappedChannel.subscribe<T>(topic, observer);
+        return originalChannel.subscribe(topic, observer);
     }
 
-    once<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
+    private once<T>(originalChannel: IChannel, topic: string, observer: ObserverFunc<any>): Promise<SubscriptionToken> {
         if (typeof topic !== 'string' || topic == "")
             throw new Error("topic must be a non-zerolength string")
-        this.stringValidator.validateTopicName(topic);
+        this._stringValidator.validateTopicName(topic);
 
-        return this.wrappedChannel.once<T>(topic, observer);
+        return originalChannel.once(topic, observer);
     }
 }
