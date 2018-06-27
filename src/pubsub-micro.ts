@@ -32,7 +32,7 @@ export type SubscriptionCache = BucketHash<ObserverFunc<any>>;
 //     }
 // }
 
-export class PubSubMicroUnvalidated implements PubSub {
+export class PubSubMicro implements PubSub {
 
     public readonly subscriptionCache: SubscriptionCache
 
@@ -47,7 +47,7 @@ export class PubSubMicroUnvalidated implements PubSub {
     private notifyStart: (() => void) | undefined;
     private notifyStop: ((status: StopStatus) => void) | undefined;
 
-    constructor(linkedInstance?: PubSubMicroUnvalidated) {
+    constructor(linkedInstance?: PubSubMicro) {
         if (linkedInstance)
             this.subscriptionCache = linkedInstance.subscriptionCache;
         else
@@ -145,9 +145,9 @@ class Channel implements IChannel {
         return this.pubsub.subscriptionCache;
     };
 
-    public pubsub: PubSubMicroUnvalidated;
+    public pubsub: PubSubMicro;
 
-    constructor(name: string, pubsub: PubSubMicroUnvalidated) {
+    constructor(name: string, pubsub: PubSubMicro) {
         this.name = name;
         this.pubsub = pubsub;
     }
@@ -205,8 +205,4 @@ class Channel implements IChannel {
     }
 }
 
-export type PubSubMicro = {
-    new(linkedInstance?: PubSubMicro): PubSubMicro
-}
-
-export const PubSubMicroValidated: PubSubMicro = addValidation(PubSubMicroUnvalidated) as any;
+export const PubSubMicroValidated = addValidation(PubSubMicro);

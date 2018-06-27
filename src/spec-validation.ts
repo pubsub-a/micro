@@ -1,6 +1,5 @@
-import { PubSubMicro } from "./pubsub";
+import { PubSubMicro, PubSubMicroUnvalidated } from "./pubsub";
 import { DefaultValidator, ValidationOptions } from "./string-validation";
-import { PubSubMicroUnvalidated } from "./pubsub-micro";
 import { addValidation } from "./validation-wrapper";
 
 /**
