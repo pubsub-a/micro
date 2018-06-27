@@ -199,7 +199,7 @@ class Channel implements IChannel {
             throw new Error(`topic must be a non-zerolength string, was: ${topic}`)
 
         if (this.pubsub.isStopped) {
-            return Promise.reject("PubSub instance has stopped")
+            return Promise.reject(new Error("PubSub instance has stopped"))
         }
 
         this.validator.validateTopicName(topic);
