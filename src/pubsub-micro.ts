@@ -67,7 +67,7 @@ export class PubSubMicro implements PubSub {
         return Promise.resolve(this);
     }
 
-    stop(status: StopStatus = { reason: "LOCAL_DISCONNECT" }): Promise<void> {
+    stop(status: StopStatus = { reason: "LOCAL_DISCONNECT", code: 0 }): Promise<void> {
         if (this.isStarted !== true) {
             throw new Error("Can not stop instance before it was started");
         }
