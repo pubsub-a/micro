@@ -1,8 +1,8 @@
-import { Channel as IChannel, ChannelType, ObserverFunc, PubSub, StopStatus, SubscriptionToken } from '@dynalon/pubsub-a-interfaces';
+import { Channel as IChannel, ChannelType, ObserverFunc, PubSub, StopStatus, SubscriptionToken as ISubscriptionToken } from '@dynalon/pubsub-a-interfaces';
 import { BucketHash } from './buckethash';
 import { invokeIfDefined, safeDispose } from "./helper";
 import * as InternalInterfaces from './internal-interfaces';
-import { SubscriptionToken as SubscriptionTokenImpl } from './subscription-token';
+import { SubscriptionToken } from './subscription-token';
 import { DefaultValidator, NameValidator } from './string-validation';
 
 export type SubscriptionCache = BucketHash<ObserverFunc<any>>;
@@ -114,7 +114,7 @@ class Subscriber<T> implements InternalInterfaces.Subscriber<T> {
     constructor(public encodedTopic: string, private subscriptionCache: SubscriptionCache) {
     }
 
-    subscribe(observer: ObserverFunc<T>): SubscriptionToken {
+    subscribe(observer: ObserverFunc<T>): ISubscriptionToken {
         const number_of_subscriptions = this.subscriptionCache.add(this.encodedTopic, observer);
 
         const onDispose = () => {
@@ -122,7 +122,7 @@ class Subscriber<T> implements InternalInterfaces.Subscriber<T> {
             return Promise.resolve(remaining);
         };
 
-        return new SubscriptionTokenImpl(onDispose, number_of_subscriptions);
+        return new SubscriptionToken(onDispose, number_of_subscriptions);
     }
 }
 
@@ -173,7 +173,7 @@ class Channel implements IChannel {
         return Promise.resolve();
     }
 
-    subscribe<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
+    subscribe<T>(topic: string, observer: ObserverFunc<T>): Promise<ISubscriptionToken> {
         if (!observer) {
             throw new Error("observer function must be given and be of type function");
         }
@@ -192,12 +192,12 @@ class Channel implements IChannel {
         return Promise.resolve(subscription);
     }
 
-    once<T>(topic: string, observer: ObserverFunc<T>): Promise<SubscriptionToken> {
+    once<T>(topic: string, observer: ObserverFunc<T>): Promise<ISubscriptionToken> {
         if (typeof topic !== 'string' || topic == "")
             throw new Error("topic must be a non-zerolength string")
         this.validator.validateTopicName(topic);
 
-        let promise: Promise<SubscriptionToken>;
+        let promise: Promise<ISubscriptionToken>;
         let alreadyRun = false;
 
         let subscribeAndDispose: ObserverFunc<T> = ((payload: T) => {
