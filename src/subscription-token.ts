@@ -1,10 +1,10 @@
-import { SubscriptionToken } from '@dynalon/pubsub-a-interfaces';
+import { SubscriptionToken as ISubscriptionToken } from '@dynalon/pubsub-a-interfaces';
 
 export interface IDisposeFunction {
     (): Promise<number>;
 }
 
-export class SubscriptionTokenImpl implements SubscriptionToken {
+export class SubscriptionToken implements ISubscriptionToken {
 
     public isDisposed: boolean = false;
     public count: number;
@@ -18,7 +18,7 @@ export class SubscriptionTokenImpl implements SubscriptionToken {
 
     dispose(): Promise<number> {
         if (this.isDisposed) {
-            throw new Error('Subscription is already disposed');
+            return Promise.resolve(0);
         }
 
         this.isDisposed = true;

@@ -2,28 +2,10 @@ import { Channel as IChannel, ChannelType, ObserverFunc, PubSub, StopStatus, Sub
 import { BucketHash } from './buckethash';
 import { invokeIfDefined, safeDispose } from "./helper";
 import * as InternalInterfaces from './internal-interfaces';
-import { SubscriptionTokenImpl } from './subscription-token';
+import { SubscriptionToken as SubscriptionTokenImpl } from './subscription-token';
 import { DefaultValidator, NameValidator } from './string-validation';
 
-
 export type SubscriptionCache = BucketHash<ObserverFunc<any>>;
-
-
-// export class PubSubMicroValidated extends PubSubValidationWrapper {
-
-//     /**
-//      * To allow shared/link PubSub instances (for testing)
-//      * expose the subscriptionCache so we can pass it to
-//      * other instances
-//      */
-//     public get subscriptionCache() {
-//         return (this.pubsub as PubSubMicroUnvalidated).subscriptionCache as SubscriptionCache;
-//     }
-
-//     constructor(subscriptionCache?: SubscriptionCache) {
-//         super(new PubSubMicroUnvalidated(subscriptionCache));
-//     }
-// }
 
 export class PubSubMicro implements PubSub {
 
