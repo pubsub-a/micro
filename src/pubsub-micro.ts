@@ -1,6 +1,6 @@
 import { Channel as IChannel, ChannelType, ObserverFunc, PubSub, StopStatus, SubscriptionToken as ISubscriptionToken } from '@dynalon/pubsub-a-interfaces';
 import { BucketHash } from './buckethash';
-import { invokeIfDefined, safeDispose } from "./helper";
+import { invokeIfDefined } from "./helper";
 import * as InternalInterfaces from './internal-interfaces';
 import { SubscriptionToken } from './subscription-token';
 import { DefaultValidator, NameValidator } from './string-validation';
@@ -205,8 +205,7 @@ class Channel implements IChannel {
             alreadyRun = true;
 
             promise.then(subs => {
-                // the user may have disposed the subscription himself, so we need to check if it is still active
-                safeDispose(subs);
+                subs.dispose();
             });
             observer(payload);
         }).bind(observer);
