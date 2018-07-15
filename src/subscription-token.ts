@@ -1,7 +1,8 @@
 import { SubscriptionToken as ISubscriptionToken } from '@dynalon/pubsub-a-interfaces';
 
-export interface IDisposeFunction {
-    (): Promise<number | undefined>;
+export interface AsyncDisposeFunction {
+    // can be number | undefined or any other type; if !== number we will map it to undefined
+    (): Promise<any>;
 }
 
 export class SubscriptionToken implements ISubscriptionToken {
@@ -9,9 +10,9 @@ export class SubscriptionToken implements ISubscriptionToken {
     public isDisposed: boolean = false;
     public count: number;
 
-    private disposeFn: IDisposeFunction;
+    private disposeFn: AsyncDisposeFunction;
 
-    constructor(onDispose: IDisposeFunction, count?: number) {
+    constructor(onDispose: AsyncDisposeFunction, count?: number) {
         this.disposeFn = onDispose;
         this.count = count ? count : 0;
     }
@@ -22,6 +23,6 @@ export class SubscriptionToken implements ISubscriptionToken {
         }
 
         this.isDisposed = true;
-        return this.disposeFn();
+        return this.disposeFn().then(count => typeof count === 'number' ? count : undefined)
     }
 }
