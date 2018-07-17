@@ -5,6 +5,10 @@ export interface AsyncDisposeFunction {
     (): Promise<any>;
 }
 
+export interface DisposeNotification {
+    (subscriptionCount: number | undefined): any;
+}
+
 export class SubscriptionToken implements ISubscriptionToken {
 
     public isDisposed: boolean = false;
@@ -16,6 +20,8 @@ export class SubscriptionToken implements ISubscriptionToken {
 
     private readonly disposeFn: AsyncDisposeFunction;
 
+    private disposeNotifications: DisposeNotification[] = [];
+
     /**
      * The count returned by the .dispose() function which we cache for further calls to dispose()
      */
@@ -24,6 +30,14 @@ export class SubscriptionToken implements ISubscriptionToken {
     constructor(onDispose: AsyncDisposeFunction, count?: number) {
         this.disposeFn = onDispose;
         this.count = count ? count : 0;
+    }
+
+    add(disposeNotification: DisposeNotification) {
+        this.disposeNotifications = [ ...this.disposeNotifications ];
+    }
+
+    remove(disposeNotification: DisposeNotification) {
+        this.disposeNotifications = this.disposeNotifications.filter(f => f === disposeNotification);
     }
 
     dispose(): Promise<number | undefined> {
@@ -35,7 +49,12 @@ export class SubscriptionToken implements ISubscriptionToken {
         return this.disposeFn().then(count => {
             const countOnDispose = typeof count === 'number' ? count : undefined;
             this.countOnDispose = countOnDispose;
+            this.notify();
             return countOnDispose;
         })
+    }
+
+    private notify() {
+        this.disposeNotifications.map(f => f(this.countOnDispose));
     }
 }
