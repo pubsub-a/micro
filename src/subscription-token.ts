@@ -1,12 +1,8 @@
-import { SubscriptionToken as ISubscriptionToken } from '@dynalon/pubsub-a-interfaces';
+import { SubscriptionToken as ISubscriptionToken, DisposeNotification } from '@dynalon/pubsub-a-interfaces';
 
 export interface AsyncDisposeFunction {
     // can be number | undefined or any other type; if !== number we will map it to undefined
     (): Promise<any>;
-}
-
-export interface DisposeNotification {
-    (subscriptionCount: number | undefined): any;
 }
 
 export class SubscriptionToken implements ISubscriptionToken {
