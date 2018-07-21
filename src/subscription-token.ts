@@ -29,7 +29,7 @@ export class SubscriptionToken implements ISubscriptionToken {
     }
 
     add(disposeNotification: DisposeNotification) {
-        this.disposeNotifications = [ ...this.disposeNotifications ];
+        this.disposeNotifications = [ ...this.disposeNotifications, disposeNotification ];
     }
 
     remove(disposeNotification: DisposeNotification) {
