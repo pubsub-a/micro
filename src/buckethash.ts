@@ -102,8 +102,6 @@ export class BucketHash<T> {
 
     /**
      * A helper function to remove an element from an array.
-     * @param {Array<any>} arr  [description]
-     * @param {any}        item [description]
      */
     private removeFromArray<T>(arr: Array<T>, item: T) {
         const index = arr.indexOf(item);
