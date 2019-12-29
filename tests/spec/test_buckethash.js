@@ -91,7 +91,7 @@ describe('BucketHash basic tests', function() {
     hash.add('key', item);
     hash.clear('key');
 
-    expect(hash.exists('key')).to.be.falsy;
+    expect(hash.exists('key')).to.be.false;
     var str = JSON.stringify(hash.dict);
     expect(str).to.equal('{}');
   });
