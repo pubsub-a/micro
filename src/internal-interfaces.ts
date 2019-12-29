@@ -1,7 +1,4 @@
-import {
-    ObserverFunc,
-    SubscriptionToken,
-} from '@dynalon/pubsub-a-interfaces';
+import { ObserverFunc, SubscriptionToken } from "@pubsub-a/interfaces";
 
 export interface Publisher<T> {
     publish(obj: T, callback?: Function): void;

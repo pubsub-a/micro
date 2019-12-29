@@ -1,22 +1,21 @@
 {
-  "name": "@dynalon/pubsub-a-micro",
+  "name": "@pubsub-a/micro",
   "version": "0.8.10",
-  "description": "Reference PubSub/A implementation",
-  "license": "UNLICENSED",
+  "description": "Reference in-memory PubSub/A implementation",
+  "license": "MIT",
   "main": "dist/pubsub.js",
   "typings": "dist/pubsub.d.ts",
   "files": [
     "dist"
   ],
   "devDependencies": {
-    "@dynalon/pubsub-a-interfaces": "^0.6.7",
-    "chai": "^3.5.0",
-    "mocha": "^5.2.0",
-    "typescript": "^3.0.1"
+    "@pubsub-a/interfaces": "^0.7.0",
+    "chai": "^4.2.0",
+    "mocha": "^6.2.2",
+    "typescript": "^3.7.4"
   },
   "scripts": {
-    "build": "npm run compile",
-    "compile": "tsc",
+    "build": "tsc",
     "test": "mocha tests/spec/*.js -- --max-old-space-size=8192"
   }
 }

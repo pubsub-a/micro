@@ -16,12 +16,11 @@ export interface NameValidator {
  */
 export function hasOnlyValidChars(name: string): boolean {
     const m = name.match(/([A-z0-9_:\/\-]+)/g);
-    const contains_invalid_chars = (m == null ||  m == undefined || m.length == 0 || m[0] !== name);
+    const contains_invalid_chars = m == null || m == undefined || m.length == 0 || m[0] !== name;
     return !contains_invalid_chars;
-};
+}
 
 export class DefaultValidator implements NameValidator {
-
     private settings: ValidationOptions;
 
     constructor(settings?: ValidationOptions) {
@@ -47,7 +46,7 @@ export class DefaultValidator implements NameValidator {
             throw new Error(`Channel name must be between 1 and ${this.settings.channelNameMaxLength} characters long`);
 
         if (!this.containsOnlyValidChars(name)) {
-            throw new Error("Channel name contains invalid characters")
+            throw new Error("Channel name contains invalid characters");
         }
     }
 
@@ -63,8 +62,7 @@ export class DefaultValidator implements NameValidator {
             throw new Error(`Topic name must be between 1 and ${this.settings.topicNameMaxLength} characters long`);
 
         // quick return if there is no special characters
-        if (this.containsOnlyValidChars(name))
-            return;
+        if (this.containsOnlyValidChars(name)) return;
 
         // quick return to avoid regex
         if (!this.settings.allowSpecialTopicSequences)
@@ -72,9 +70,8 @@ export class DefaultValidator implements NameValidator {
 
         // EXCEPTION: the special sequence _$_ and _%_ are allowed
         let repl = name;
-        repl = repl.replace(/_\$_/g, '');
-        repl = repl.replace(/_%_/g, '');
-        if (!this.containsOnlyValidChars(repl))
-            throw new Error(`Topic name contains unallowed character(s): ${name}`);
+        repl = repl.replace(/_\$_/g, "");
+        repl = repl.replace(/_%_/g, "");
+        if (!this.containsOnlyValidChars(repl)) throw new Error(`Topic name contains unallowed character(s): ${name}`);
     }
 }

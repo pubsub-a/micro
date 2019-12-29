@@ -1,4 +1,4 @@
-import { SubscriptionToken as ISubscriptionToken, DisposeNotification } from '@dynalon/pubsub-a-interfaces';
+import { SubscriptionToken as ISubscriptionToken, DisposeNotification } from "@pubsub-a/interfaces";
 
 export interface AsyncDisposeFunction {
     // can be number | undefined or any other type; if !== number we will map it to undefined
@@ -6,7 +6,6 @@ export interface AsyncDisposeFunction {
 }
 
 export class SubscriptionToken implements ISubscriptionToken {
-
     public isDisposed: boolean = false;
 
     /**
@@ -29,7 +28,7 @@ export class SubscriptionToken implements ISubscriptionToken {
     }
 
     add(disposeNotification: DisposeNotification) {
-        this.disposeNotifications = [ ...this.disposeNotifications, disposeNotification ];
+        this.disposeNotifications = [...this.disposeNotifications, disposeNotification];
     }
 
     remove(disposeNotification: DisposeNotification) {
@@ -43,11 +42,11 @@ export class SubscriptionToken implements ISubscriptionToken {
 
         this.isDisposed = true;
         return this.disposeFn().then(count => {
-            const countOnDispose = typeof count === 'number' ? count : undefined;
+            const countOnDispose = typeof count === "number" ? count : undefined;
             this.countOnDispose = countOnDispose;
             this.notify();
             return countOnDispose;
-        })
+        });
     }
 
     private notify() {

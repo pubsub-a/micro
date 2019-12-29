@@ -11,29 +11,25 @@ function getValidatedInstance(linkedInstance?: PubSubMicro, validationOptions?: 
     return new PubSubMicro(linkedInstance, validator);
 }
 
-const getPubSubImplementation = function (options?: any) {
+const getPubSubImplementation = function(options?: any) {
     return new PubSubMicro();
 };
 
-const getLinkedPubSubImplementation = function (numInstances: number, options: any) {
-
+const getLinkedPubSubImplementation = function(numInstances: number, options: any) {
     if (!numInstances) {
         numInstances = 2;
     }
 
     let instance: PubSubMicro;
-    if (options && options.validationOptions)
-        instance = getValidatedInstance(undefined, options.validationOptions);
-    else
-        instance = new PubSubMicro();
+    if (options && options.validationOptions) instance = getValidatedInstance(undefined, options.validationOptions);
+    else instance = new PubSubMicro();
 
     const instances: Array<any> = [];
 
     while (numInstances-- > 0) {
         if (options && options.validationOptions)
             instances.push(getValidatedInstance(undefined, options.validationOptions));
-        else
-            instances.push(new PubSubMicro(instance));
+        else instances.push(new PubSubMicro(instance));
     }
 
     return instances;
@@ -41,8 +37,4 @@ const getLinkedPubSubImplementation = function (numInstances: number, options: a
 
 const name = "PubSubMicro";
 
-export {
-    getPubSubImplementation,
-    getLinkedPubSubImplementation,
-    name,
-}
+export { getPubSubImplementation, getLinkedPubSubImplementation, name };

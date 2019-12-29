@@ -1,13 +1,11 @@
 sudo: false
 language: node_js
 node_js:
-  - 'stable'
+  - 'node'
 
 install:
-  # newer npm spinner is just a pain and will mess up in the logfiles
-  - npm config set spin=false
-  - npm install
+  - yarn install
 
 script:
-  # compile main source
-  - npm run build
+  - yarn build
+  - yarn test

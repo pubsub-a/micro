@@ -2,7 +2,7 @@
  * A Hashtable that contains a flat list of entries (bucket) for a given key.
  */
 export class BucketHash<T> {
-    private dict = new Map<string, T[]>()
+    private dict = new Map<string, T[]>();
 
     /**
      * Adds an element to the bucket addressed by key.
@@ -30,7 +30,7 @@ export class BucketHash<T> {
      */
     get(key: string): Array<T> {
         if (this.dict.has(key)) {
-            return this.dict.get(key)!
+            return this.dict.get(key)!;
         } else {
             return [];
         }
@@ -39,7 +39,7 @@ export class BucketHash<T> {
     /**
      * Gets all keys in the bucket.
      */
-    keys(): IterableIterator<string>  {
+    keys(): IterableIterator<string> {
         return this.dict.keys();
     }
 
@@ -79,7 +79,7 @@ export class BucketHash<T> {
                 // if an item is given but there is no bucket, we ran into an error - the item was
                 // removed earlier of the bucket was cleared earlier
                 throw new Error(`Key '${key}' does not exist`);
-           }
+            }
         }
 
         if (!item) {
@@ -88,14 +88,12 @@ export class BucketHash<T> {
         }
 
         // iterate over the available elements
-        let index = this.removeFromArray(bucket, item)
+        let index = this.removeFromArray(bucket, item);
 
-        if (index === -1)
-            throw new Error("Trying to remove non-existant element from the bucket");
+        if (index === -1) throw new Error("Trying to remove non-existant element from the bucket");
 
         // to save memory we remove the key completely when the bucket becomes empty
-        if (bucket.length === 0)
-            this.dict.delete(key);
+        if (bucket.length === 0) this.dict.delete(key);
 
         return bucket.length;
     }
@@ -106,8 +104,7 @@ export class BucketHash<T> {
     private removeFromArray<T>(arr: Array<T>, item: T) {
         const index = arr.indexOf(item);
 
-        if (index >= 0)
-            arr.splice(index, 1);
+        if (index >= 0) arr.splice(index, 1);
 
         return index;
     }
