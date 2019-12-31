@@ -11,6 +11,7 @@ import { invokeIfDefined } from "./helper";
 import * as InternalInterfaces from "./internal-interfaces";
 import { SubscriptionToken } from "./subscription-token";
 import { DefaultValidator, NameValidator } from "./string-validation";
+import { randomString } from "./util";
 
 export type SubscriptionCache = BucketHash<ObserverFunc<any>>;
 
@@ -24,7 +25,7 @@ export class PubSubMicro implements PubSub {
     public onStart: Promise<void>;
     public onStop: Promise<StopStatus>;
 
-    public clientId: string = "";
+    public clientId: string = randomString(10);
 
     private notifyStart: (() => void) | undefined;
     private notifyStop: ((status: StopStatus) => void) | undefined;

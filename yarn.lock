@@ -2,10 +2,12 @@
 # yarn lockfile v1
 
 
-"@pubsub-a/interfaces@^0.7.0":
-  version "0.7.0"
-  resolved "https://registry.yarnpkg.com/@pubsub-a/interfaces/-/interfaces-0.7.0.tgz#ad91eb804cf9f9d6842480c1b89b25a4c7d4e0df"
-  integrity sha512-aOTc+lY+ZyLv/sy/ZIhirxNFgrQKMIAHOlLZUuyIKHweIWqcMb0aswlQDpBgXYVXO25H5UwhaJzqrJyBTWWhUg==
+"@pubsub-a/interfaces@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@pubsub-a/interfaces/-/interfaces-0.7.1.tgz#39fb0a7d7b862f77e5d7ea8de8a7e222165436dc"
+  integrity sha512-hGu/I/A2XwDL+tCrfwG0Yp4pBOpTEUtONEUTKMeCLyg1//kOYO++PLw60y3jD7bBtQuOljUkHtRrz/8yu5d5pw==
+  dependencies:
+    prettier "^1.19.1"
 
 ansi-colors@3.2.3:
   version "3.2.3"
@@ -475,6 +477,11 @@ pathval@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/pathval/-/pathval-1.1.0.tgz#b942e6d4bde653005ef6b71361def8727d0645e0"
   integrity sha1-uULm1L3mUwBe9rcTYd74cn0GReA=
+
+prettier@^1.19.1:
+  version "1.19.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-1.19.1.tgz#f7d7f5ff8a9cd872a7be4ca142095956a60797cb"
+  integrity sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==
 
 require-directory@^2.1.1:
   version "2.1.1"
