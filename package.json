@@ -1,6 +1,6 @@
 {
   "name": "@pubsub-a/micro",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Reference in-memory PubSub/A implementation",
   "license": "MIT",
   "main": "dist/pubsub.js",
