@@ -7,7 +7,6 @@ import {
     SubscriptionToken as ISubscriptionToken
 } from "@pubsub-a/interfaces";
 import { BucketHash } from "./buckethash";
-import { invokeIfDefined } from "./helper";
 import * as InternalInterfaces from "./internal-interfaces";
 import { SubscriptionToken } from "./subscription-token";
 import { DefaultValidator, NameValidator } from "./string-validation";
@@ -100,7 +99,7 @@ class Publisher<T> implements InternalInterfaces.Publisher<T> {
         this.subscriptionCache = subscriptionCache;
     }
 
-    publish(obj: T): void {
+    publish<T>(obj: T): void {
         const subs = this.subscriptionCache.get(this.encodedTopic);
         for (let observer of subs) {
             try {
@@ -128,7 +127,7 @@ class Subscriber<T> implements InternalInterfaces.Subscriber<T> {
     }
 }
 
-class Channel implements IChannel {
+class Channel<TMap extends {} = any> implements IChannel<TMap> {
     name: string;
 
     private get subscriptionCache() {
@@ -157,7 +156,7 @@ class Channel implements IChannel {
         return encodedTopic;
     }
 
-    publish<T>(topic: string, payload: T, callback?: Function): Promise<any> {
+    publish<K extends keyof TMap>(topic: K, payload: TMap[K]): Promise<any> {
         if (typeof topic !== "string" || topic == "")
             throw new Error(`topic must be a non-zerolength string, was: ${topic}`);
 
@@ -170,13 +169,12 @@ class Channel implements IChannel {
 
         this.validator.validateTopicName(topic);
 
-        const publisher = new Publisher<T>(this.encodeTopic(topic), this.subscriptionCache);
+        const publisher = new Publisher<K>(this.encodeTopic(topic), this.subscriptionCache);
         publisher.publish(payload);
-        invokeIfDefined(callback, topic, payload);
         return Promise.resolve();
     }
 
-    subscribe<T>(topic: string, observer: ObserverFunc<T>): Promise<ISubscriptionToken> {
+    subscribe<K extends keyof TMap>(topic: K, observer: ObserverFunc<TMap[K]>): Promise<ISubscriptionToken> {
         if (!observer) {
             throw new Error("observer function must be given and be of type function");
         }
@@ -189,20 +187,20 @@ class Channel implements IChannel {
 
         this.validator.validateTopicName(topic);
 
-        const subscriber = new Subscriber<T>(this.encodeTopic(topic), this.subscriptionCache);
+        const subscriber = new Subscriber<TMap[K]>(this.encodeTopic(topic), this.subscriptionCache);
         const subscription = subscriber.subscribe(observer);
 
         return Promise.resolve(subscription);
     }
 
-    once<T>(topic: string, observer: ObserverFunc<T>): Promise<ISubscriptionToken> {
+    once<K extends keyof TMap>(topic: K, observer: ObserverFunc<TMap[K]>): Promise<ISubscriptionToken> {
         if (typeof topic !== "string" || topic == "") throw new Error("topic must be a non-zerolength string");
         this.validator.validateTopicName(topic);
 
         let promise: Promise<ISubscriptionToken>;
         let alreadyRun = false;
 
-        let subscribeAndDispose: ObserverFunc<T> = ((payload: T) => {
+        let subscribeAndDispose: ObserverFunc<TMap[K]> = ((payload: TMap[K]) => {
             if (alreadyRun) return;
             alreadyRun = true;
 
@@ -212,7 +210,7 @@ class Channel implements IChannel {
             observer(payload);
         }).bind(observer);
 
-        promise = this.subscribe<T>(topic, subscribeAndDispose);
+        promise = this.subscribe(topic, subscribeAndDispose);
         return promise;
     }
 }

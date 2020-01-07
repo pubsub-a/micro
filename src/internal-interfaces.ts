@@ -1,7 +1,7 @@
 import { ObserverFunc, SubscriptionToken } from "@pubsub-a/interfaces";
 
 export interface Publisher<T> {
-    publish(obj: T, callback?: Function): void;
+    publish<T>(obj: T, callback?: Function): void;
 }
 
 export interface Subscriber<T> {
