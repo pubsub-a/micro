@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@pubsub-a/interfaces@^0.7.3":
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/@pubsub-a/interfaces/-/interfaces-0.7.3.tgz#c00d4d020de5b812587716db03ff5ac076758720"
-  integrity sha512-7ru22vZqifcHAdWUlN+N2dIUnPEPfuwSgvo4dABulm5WNOcxpmzWboy4b00pxfp0LuOkNXKLWUuPq18NVHNUjw==
+"@pubsub-a/interfaces@^0.7.5":
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/@pubsub-a/interfaces/-/interfaces-0.7.5.tgz#f354c21afbe8d6ee5495067bfeb0148e16ce09ec"
+  integrity sha512-Ke/f4+0BdgsTsRykipUPRmSfONDx0lDh5La8IFGn4+F3h/TR7h9tY+eUWTY7n7saE3Bf6Xv7nkn+2kMmRGHLHA==
   dependencies:
     prettier "^1.19.1"
 
